@@ -1,0 +1,21 @@
+---
+subsys:
+  name: runtime-config
+  type: bosh-config
+
+input_resources:
+  - name: bosh-deployment
+    type: git
+    uri: https://github.com/cloudfoundry/bosh-deployment.git
+    version: "a6f337d" # BOSH v271.2.0 (as of Sep 24th, 2020)
+
+
+main_config_file: bosh-deployment/runtime-configs/dns.yml
+
+operations_files: {}
+
+
+config_vars: {}
+
+
+imported_vars: []

@@ -1,0 +1,550 @@
+---
+
+# ----------- #
+# Internal CA #
+# ----------- #
+
+- path: /variables/name=concourse-internal-ca?
+  type: replace
+  value:
+    name: concourse-internal-ca
+    type: certificate
+    options:
+      is_ca: true
+      common_name: Concourse internal CA
+    update_mode: converge
+
+
+
+# ------------------------------------------------ #
+# BOSH addons: BPM, DNS Aliases & Database CA cert #
+# ------------------------------------------------ #
+
+- path: /releases/name=bpm?
+  type: replace
+  value:
+    name: bpm
+    version: ((bpm_version))
+    url: https://bosh.io/d/github.com/cloudfoundry-incubator/bpm-release?v=((bpm_version))
+    sha1: ((bpm_sha1))
+
+- path: /releases/name=bosh-dns-aliases?
+  type: replace
+  value:
+    name: bosh-dns-aliases
+    version: ((bosh_dns_aliases_version))
+    url: https://bosh.io/d/github.com/cloudfoundry/bosh-dns-aliases-release?v=((bosh_dns_aliases_version))
+    sha1: ((bosh_dns_aliases_sha1))
+
+- path: /releases/name=os-conf?
+  type: replace
+  value:
+    name: os-conf
+    version: ((os_conf_version))
+    url: https://bosh.io/d/github.com/cloudfoundry/os-conf-release?v=((os_conf_version))
+    sha1: ((os_conf_sha1))
+
+- path: /addons?/name=bpm
+  type: replace
+  value:
+    name: bpm
+    include:
+      instance_groups:
+        - uaa
+        - credhub
+    jobs:
+      - name: bpm
+        release: bpm
+
+- path: /addons/name=bosh-dns-aliases?/jobs/name=bosh-dns-aliases/release
+  type: replace
+  # Note: we use this trick here, for defining 'name:' and 'release:' keys
+  # only, in order to define the addon without clobbering any previously-
+  # defined aliases properties.
+  value: bosh-dns-aliases
+
+- path: /addons/name=trusted-ca-certs?
+  type: replace
+  value:
+    name: trusted-ca-certs
+    include:
+      instance_groups:
+        - uaa
+        - credhub
+        - web
+        - workers
+    jobs:
+      - name: ca_certs
+        release: os-conf
+        properties:
+          certs: |
+            ((concourse-internal-ca.certificate))
+
+
+
+# ------------------------ #
+# Instance groups ordering #
+# ------------------------ #
+
+- path: /instance_groups/name=db:after
+  type: replace
+  value:
+    name: uaa
+    instances: 1
+    azs: ((azs))
+    networks: [ { name: ((network_name)) } ]
+    stemcell: xenial
+    vm_type: default
+
+- path: /instance_groups/name=uaa:after
+  type: replace
+  value:
+    name: credhub
+    instances: 1
+    azs: ((azs))
+    networks: [ { name: ((network_name)) } ]
+    stemcell: xenial
+    vm_type: default
+
+
+
+# ------- #
+# CredHub #
+# ------- #
+
+- path: /releases/name=credhub?
+  type: replace
+  value:
+    name: credhub
+    version: ((credhub_version))
+    url: https://bosh.io/d/github.com/pivotal-cf/credhub-release?v=((credhub_version))
+    sha1: ((credhub_sha1))
+
+- path: /addons?/name=bosh-dns-aliases/jobs/name=bosh-dns-aliases/properties?/aliases/-
+  type: replace
+  value:
+    domain: &credhub_service_address credhub.service.concourse.internal
+    targets:
+    - query: '*'
+      instance_group: credhub
+      deployment: ((deployment_name))
+      network: ((network_name))
+      domain: bosh
+
+- path: /instance_groups/name=credhub/jobs?/name=credhub
+  type: replace
+  value:
+    name: credhub
+    release: credhub
+    properties:
+      bpm: { enabled: true }
+      credhub:
+        port: ((credhub_tls_port)) # explicit that value for the glue below to stick
+        tls: ((credhub-tls))
+        internal_url: *credhub_service_address # this is for other instance groups to auto-configure through the 'credhub' BOSH link
+        ca_certificate: ((credhub-tls.ca))     # this is for other instance groups to auto-configure through the 'credhub' BOSH link
+        authentication:
+          uaa:
+            enabled: true
+            url: https://uaa.((external_host))
+            internal_url: https://uaa.service.concourse.internal:((uaa_tls_port))
+            ca_certs:
+              - ((uaa-tls.ca))
+        data_storage:
+          type: postgres
+          username: &credhub_db_username credhub
+          password: &credhub_db_password ((credhub-database-password))
+          database: &credhub_db_name credhub
+        encryption:
+          keys:
+            - provider_name: internal_encrypter
+              key_properties:
+                encryption_password: ((credhub-encryption-password))
+              active: true
+          providers:
+            - name: internal_encrypter
+              type: internal
+        log_level: ((log_level))
+        max_heap_size: 384
+
+- path: /instance_groups/name=credhub/update?/canary_watch_time
+  type: replace
+  value: 10000-120000
+
+- path: /instance_groups/name=credhub/update?/update_watch_time
+  type: replace
+  value: 10000-120000
+
+
+- path: /instance_groups/name=db/jobs/name=postgres/properties/databases/databases/-
+  type: replace
+  value:
+    name: *credhub_db_name
+
+- path: /instance_groups/name=db/jobs/name=postgres/properties/databases/roles/-
+  type: replace
+  value:
+    name: *credhub_db_username
+    password: *credhub_db_password
+
+
+- path: /variables/name=credhub-tls?
+  type: replace
+  value:
+    name: credhub-tls
+    type: certificate
+    options:
+      ca: concourse-internal-ca
+      common_name: *credhub_service_address
+      alternative_names:
+        - *credhub_service_address
+    update_mode: converge
+
+- path: /variables/name=credhub-database-password?
+  type: replace
+  value:
+    name: credhub-database-password
+    type: password
+
+- path: /variables/name=credhub-encryption-password?
+  type: replace
+  value:
+    name: credhub-encryption-password
+    type: password
+
+
+
+# --- #
+# UAA #
+# --- #
+
+- path: /releases/name=uaa?
+  type: replace
+  value:
+    name: uaa
+    version: ((uaa_version))
+    url: https://bosh.io/d/github.com/cloudfoundry/uaa-release?v=((uaa_version))
+    sha1: ((uaa_sha1))
+
+- path: /addons?/name=bosh-dns-aliases/jobs/name=bosh-dns-aliases/properties?/aliases/-
+  type: replace
+  value:
+    domain: &uaa_service_address uaa.service.concourse.internal
+    targets:
+      - query: '*'
+        instance_group: uaa
+        deployment: ((deployment_name))
+        network: ((network_name))
+        domain: bosh
+
+- path: /instance_groups/name=uaa/jobs?/name=uaa?
+  type: replace
+  value:
+    name: uaa
+    release: uaa
+    consumes:
+      database: { from: postgres }
+    properties:
+      bpm: { enabled: false } # conflicts with the '/home/vcap/.postgresql/root.crt' workaround below
+      uaa:
+        url: https://uaa.((external_host))
+        ssl:
+          port: ((uaa_tls_port)) # explicit that value for the glue below to stick
+        catalina_opts: "-Djava.security.egd=file:/dev/./urandom -Xms384m -Xmx384m -XX:MaxMetaspaceSize=256m"
+        scim:
+          users:
+            - name: admin
+              password: ((uaa-admin-user-password))
+              groups:
+                - scim.write
+                - scim.read
+                - credhub.read
+                - credhub.write
+        admin: { client_secret: ((uaa-admin-client-secret)) }
+        login: { client_secret: ((uaa-login-client-secret)) }
+        zones: { internal: { hostnames: [ "uaa.((external_host))", *uaa_service_address ] } }
+        sslCertificate: ((uaa-tls.certificate))
+        sslPrivateKey: ((uaa-tls.private_key))
+        jwt:
+          revocable: true
+          policy:
+            active_key_id: key-1
+            keys:
+              key-1:
+                signingKey: ((uaa-jwt-signing-key.private_key))
+        logging_level: ((log_level))
+      uaadb:
+        port: 5432
+        db_scheme: postgresql
+        databases:
+          - tag: uaa
+            name: &uaa_db_name uaa
+        roles:
+          - tag: admin
+            name: &uaa_db_username uaa
+            password: ((uaa-db-password))
+      login:
+        saml:
+          serviceProviderCertificate: ((uaa-tls.certificate))
+          serviceProviderKey: ((uaa-tls.private_key))
+          serviceProviderKeyPassword: ""
+      encryption:
+        active_key_label: encryption_key1
+        encryption_keys:
+          - label: encryption_key1
+            passphrase: ((uaa-encryption-passphrase))
+
+- path: /instance_groups/name=uaa/update?/canary_watch_time
+  type: replace
+  value: 10000-120000
+
+- path: /instance_groups/name=uaa/update?/update_watch_time
+  type: replace
+  value: 10000-120000
+
+
+- path: /instance_groups/name=db/jobs/name=postgres/properties/databases/databases/-
+  type: replace
+  value:
+    name: *uaa_db_name
+
+- path: /instance_groups/name=db/jobs/name=postgres/properties/databases/roles/-
+  type: replace
+  value:
+    name: *uaa_db_username
+    password: ((uaa-db-password))
+
+
+- path: /variables/name=uaa-admin-user-password?
+  type: replace
+  value:
+    name: uaa-admin-user-password
+    type: password
+
+- path: /variables/name=uaa-jwt-signing-key?
+  type: replace
+  value:
+    name: uaa-jwt-signing-key
+    type: rsa
+    options:
+      key_length: 4096
+
+- path: /variables/name=uaa-tls?
+  type: replace
+  value:
+    name: uaa-tls
+    type: certificate
+    options:
+      ca: concourse-internal-ca
+      common_name: *uaa_service_address
+      alternative_names:
+        - *uaa_service_address
+    update_mode: converge
+
+- path: /variables/name=uaa-admin-client-secret?
+  type: replace
+  value:
+    name: uaa-admin-client-secret
+    type: password
+
+- path: /variables/name=uaa-login-client-secret?
+  type: replace
+  value:
+    name: uaa-login-client-secret
+    type: password
+
+- path: /variables/name=uaa-db-password?
+  type: replace
+  value:
+    name: uaa-db-password
+    type: password
+
+- path: /variables/name=uaa-encryption-passphrase?
+  type: replace
+  value:
+    name: uaa-encryption-passphrase
+    type: password
+
+
+
+# --------------------------- #
+# UAA integration for CredHub #
+# --------------------------- #
+
+- path: /instance_groups/name=uaa/jobs/name=uaa/properties/uaa/clients?/credhub_cli
+  type: replace
+  value:
+    override: true
+    authorized-grant-types: password,refresh_token
+    scope: credhub.read,credhub.write
+    authorities: uaa.resource
+    access-token-validity: 600
+    refresh-token-validity: 3600
+    secret: ""
+
+- path: /instance_groups/name=uaa/jobs/name=uaa/properties/uaa/clients?/credhub-admin
+  type: replace
+  value:
+    override: true
+    authorized-grant-types: client_credentials
+    scope: ""
+    authorities: credhub.read,credhub.write
+    access-token-validity: 600
+    access-token-validity: 3600
+    secret: ((credhub-admin-client-secret))
+
+- path: /instance_groups/name=credhub/jobs/name=credhub/properties/credhub/authorization?/permissions/-
+  type: replace
+  value:
+    path: /*
+    actors:
+      - uaa-user:credhub_cli
+      - uaa-client:credhub-admin
+    operations: [ read, write, delete, read_acl, write_acl ]
+
+- path: /variables/-
+  type: replace
+  value:
+    name: credhub-admin-client-secret
+    type: password
+
+
+
+# --------------------------------- #
+# CredHub integration for Concourse #
+# --------------------------------- #
+
+# From turbo <https://github.com/pivotalservices/turbo/blob/master/deployments/ucc/manifest/manifest.yml#L68-L76>
+- path: /instance_groups/name=web/jobs/name=web/properties/credhub?
+  type: replace
+  value:
+    path_prefix: /concourse
+    url: https://credhub.service.concourse.internal:((credhub_tls_port))
+    tls:
+      ca_cert:
+        certificate: ((concourse-internal-ca.certificate))
+      insecure_skip_verify: false
+    client_id: concourse-to-credhub
+    client_secret: ((concourse-to-credhub-client-secret))
+
+# From turbo <https://github.com/pivotalservices/turbo/blob/master/deployments/ucc/manifest/manifest.yml#L137-L145>
+# From BUCC <https://github.com/starkandwayne/bucc/blob/master/ops/4-concourse-credhub.yml#L12-L20>
+- path: /instance_groups/name=uaa/jobs/name=uaa/properties/uaa/clients/concourse-to-credhub?
+  type: replace
+  value:
+    override: true
+    authorized-grant-types: client_credentials,password,refresh_token
+    scope: ""
+    # NOTE: surprisingly, the 'credhub.write' is necessary here, or we get this error:
+    # failed to interpolate task config: Finding variable '...': insufficient_scope: Insufficient scope for this resource
+    authorities: credhub.read,credhub.write
+    access-token-validity: 600
+    refresh-token-validity: 3600
+    secret: ((concourse-to-credhub-client-secret))
+
+- path: /instance_groups/name=credhub/jobs/name=credhub/properties/credhub/authorization/permissions/-
+  type: replace
+  value:
+    path: /concourse/*
+    actors: [ uaa-client:concourse-to-credhub ]
+    operations: [ read ]
+
+- path: /variables/name=concourse-to-credhub-client-secret?
+  type: replace
+  value:
+    name: concourse-to-credhub-client-secret
+    type: password
+
+
+
+# ------------------------------------- #
+# Database TLS for ATC, CredHub and UAA #
+# ------------------------------------- #
+
+
+- path: /instance_groups/name=web/jobs/name=web/properties/postgresql/sslmode?
+  type: replace
+  value: verify-ca
+
+- path: /instance_groups/name=web/jobs/name=web/properties/postgresql/ca_cert?
+  type: replace
+  value: ((database-tls.ca))
+
+
+- path: /instance_groups/name=credhub/jobs/name=credhub/properties/credhub/data_storage/require_tls?
+  type: replace
+  value: true
+
+- path: /instance_groups/name=credhub/jobs/name=credhub/properties/credhub/data_storage/tls_ca?
+  type: replace
+  value: ((database-tls.ca))
+
+# - path: /instance_groups/name=credhub/jobs/name=pre-start-script?
+#   type: replace
+#   value:
+#     # NOTE: UAA database schema upgrades require the PostgreSQL root CA
+#     # certificate to be in '/home/vcap/.postgresql/root.crt'
+#     name: pre-start-script
+#     release: os-conf
+#     properties:
+#       script: |
+#         #!/usr/bin/env bash
+#         set -ex
+#         mkdir -p /home/vcap/.postgresql
+#         chown vcap:vcap /home/vcap/.postgresql
+#         cat > /home/vcap/.postgresql/root.crt <<EOF
+#         ((database-tls.ca))
+#         EOF
+#         chown vcap:vcap /home/vcap/.postgresql/root.crt
+
+
+- path: /instance_groups/name=uaa/jobs/name=uaa/properties/uaadb/tls_enabled?
+  type: replace
+  # Note: enabling this requires the CA cert to be in
+  # /usr/local/share/ca-certificates, as the 'ca_cert' job of 'os-conf'
+  # release does above.
+  value: true
+
+- path: /instance_groups/name=uaa/jobs/name=pre-start-script?
+  type: replace
+  value:
+    # NOTE: UAA database schema upgrades require the PostgreSQL root CA
+    # certificate to be in '/home/vcap/.postgresql/root.crt'
+    name: pre-start-script
+    release: os-conf
+    properties:
+      script: |
+        #!/usr/bin/env bash
+        set -ex
+        mkdir -p /home/vcap/.postgresql
+        chown vcap:vcap /home/vcap/.postgresql
+        cat > /home/vcap/.postgresql/root.crt <<EOF
+        ((database-tls.ca))
+        EOF
+        chown vcap:vcap /home/vcap/.postgresql/root.crt
+
+
+- path: /instance_groups/name=uaa/jobs/name=uaa/properties/uaadb/skip_ssl_validation?
+  type: replace
+  value: false
+
+- path: /instance_groups/name=db/jobs/name=postgres/properties/databases/tls?
+  type: replace
+  value: ((database-tls))
+    # ca: ((database-tls.ca))
+    # certificate: ((database-tls.certificate))
+    # private_key: ((database-tls.private_key))
+
+
+- path: /variables/name=database-tls?
+  type: replace
+  value:
+    name: database-tls
+    type: certificate
+    options:
+      ca: concourse-internal-ca
+      common_name: q-s0.db.((network_name)).((deployment_name)).bosh
+      alternative_names:
+        - q-s0.db.((network_name)).((deployment_name)).bosh
+        - 127.0.0.1
+    update_mode: converge

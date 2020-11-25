@@ -1,0 +1,10 @@
+---
+
+- path: /vm_extensions/-
+  type: replace
+  value:
+    name: traefik-loadbalancer
+    cloud_properties:
+      ports:
+        - host: 80
+        - host: 443

@@ -1,0 +1,113 @@
+---
+subsys:
+  name: traefik
+  type: bosh-deployment
+  depends_on: []
+
+input_resources:
+  - name: traefik-boshrelease
+    type: git
+    uri: https://github.com/gstackio/traefik-boshrelease.git
+    version: "6473e21" # v1.14.0 (Traefik v1.7.26) with compiled release for stemcell v621.90
+
+
+main_deployment_file: traefik-boshrelease/deployment/traefik.yml
+
+operations_files:
+  10_traefik-boshrelease:
+    - deployment/operations/enable-lets-encrypt
+    - deployment/operations/enable-api  # required by the smoke tests
+    - deployment/operations/enable-rest # required by the smoke tests
+    - deployment/operations/static-ip
+  20_local:
+    - pin-stemcell
+    - scale-disk
+    # - activate-debug
+    - routing
+    - traefik-config
+
+variables_files:
+  10_local:
+    - file: private-config
+      example:
+        # User-facing settings
+        traefik_domain: ci.example.com
+        acme_certs_email: acme-certs@example.com
+        api_username: admin
+
+
+deployment_vars:
+  deployment_name: traefik
+
+
+  # Debugging
+
+  acme_staging: false
+
+
+  # Versions
+
+  stemcell_name: bosh-warden-boshlite-ubuntu-xenial-go_agent
+  stemcell_os: ubuntu-xenial
+  stemcell_version: "621.84"
+  stemcell_sha1: 305497923033888fd8186aa257e15bc382f2067e
+
+
+  # Reference declarations
+
+  network_name: default
+  # Reflecting 'traefik-boshrelease/deployment/cloud-config/cf-integration.yml':
+  traefik_vm_extension: traefik-loadbalancer
+
+
+imported_vars:
+  - subsys: traefik
+    imports:
+      # Note: this is actually an auto-import trick in order to inject a value
+      # from private-config.yml into the 'api_hostname' variable
+      - name: api_hostname
+        from: vars-file
+        file: private-config
+        value: traefik.((traefik_domain))
+
+  - subsys: ddbox-garden-env # instead of generic 'base-env', to be fixed
+    imports:
+      - name: static_ip
+        from: depl-vars
+        path: /web_router_ip
+
+  - subsys: concourse
+    imports:
+      - name: concourse_external_host
+        from: vars-file
+        file: private-config
+        path: /external_host
+      - name: concourse_web_ip0
+        from: depl-vars
+        path: /web_ip0
+      - name: concourse_web_ip1
+        from: depl-vars
+        path: /web_ip1
+      - name: concourse_tls_port
+        from: depl-vars
+        path: /atc_tls_bind_port
+
+      - name: concourse_credhub_ip0
+        from: depl-vars
+        path: /credhub_ip0
+      - name: concourse_credhub_ip1
+        from: depl-vars
+        path: /credhub_ip1
+      - name: credhub_tls_port
+        from: depl-vars
+        path: /credhub_tls_port
+
+      - name: concourse_uaa_ip0
+        from: depl-vars
+        path: /uaa_ip0
+      - name: concourse_uaa_ip1
+        from: depl-vars
+        path: /uaa_ip1
+      - name: uaa_tls_port
+        from: depl-vars
+        path: /uaa_tls_port

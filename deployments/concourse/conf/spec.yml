@@ -1,0 +1,139 @@
+---
+subsys:
+  name: concourse
+  type: bosh-deployment
+
+input_resources:
+  - name: concourse-deployment
+    type: git
+    uri: https://github.com/concourse/concourse-bosh-deployment.git
+    version: v5.8.1
+
+
+sanity-tests:
+  concourse-target: gk # like Gstack
+
+
+main_deployment_file: concourse-deployment/cluster/concourse.yml
+
+
+operations_files:
+  10_local:
+    - reorder-instance-groups
+  20_concourse-deployment:
+    - cluster/operations/worker-ephemeral-disk
+    - cluster/operations/encryption
+    - cluster/operations/tls
+    - cluster/operations/tls-vars
+    - cluster/operations/storage-driver
+  30_local:
+    - pin-stemcell
+    - set-log-level
+    - basic-auth-with-vars  # replaces 'cluster/operations/basic-auth'
+    - encryption-vars       # augments 'cluster/operations/encryption'
+    - credhub-integration-with-uaa-and-db-tls
+    - routing
+    - trust-traefik-ca
+    - static-web
+    - static-credhub
+    - static-uaa
+    - scale-for-minimal-downtime-upgrades
+
+
+variables_files:
+  10_concourse-deployment:
+    # Note: most version values defined here by the 'versions.yml' file are
+    # actually overridden below by deployment variables. This mainly because
+    # currently, the variables defined in such a variables file cannot be
+    # imported by other subsystems.
+    - file: versions
+  20_local:
+    - file: private-config
+      example:
+        # User-facing settings
+        external_host: ci.example.com
+        atc_basic_auth_username: admin
+
+
+deployment_vars:
+  deployment_name: concourse
+
+
+  azs: [ z1 ] # shim
+
+
+  # Versions
+
+  os_conf_version: "22.1.0"
+  os_conf_sha1: 7ef05f6f3ebc03f59ad8131851dbd1abd1ab3663
+
+  bosh_dns_aliases_version: "0.0.3"
+  bosh_dns_aliases_sha1: b0d0a0350ed87f1ded58b2ebb469acea0e026ccc
+
+  credhub_version: "2.9.0"
+  credhub_sha1: 36d3a92588c33bc3a7ce54cd4714c96cc7d1bee2
+
+  uaa_version: "74.25.0"
+  uaa_sha1: 7eb46ce8d64d11e3bcfb52fc7c26c1e72085fd69
+  # uaa_version: "74.27.0"
+  # uaa_sha1: 8307934c9cba6c1885bf4c1647ace960d84a78a4
+
+  # stemcell_os:              # imported below
+  # stemcell_version:         # imported below
+  # stemcell_sha1:            # imported below
+
+  # stemcell_name: bosh-azure-hyperv-ubuntu-xenial-go_agent
+  # stemcell_os: ubuntu-xenial
+  # stemcell_version: "621.92"
+  # stemcell_sha1: 7f231f0ca5b521e0d13bc1e97c194c68baff3242
+
+
+  # Scaling properties
+
+  web_vm_type: default    # t2.nano      # 1 CPU, 0.5GB RAM
+  db_vm_type: default     # t2.micro     # 1 CPU, 1GB RAM
+  db_persistent_disk_type: 20GB
+  worker_vm_type: default # m3.medium    # 1 CPU, 3.75GB RAM
+  # A VM extension from your BOSH Director's cloud config that will attach
+  # sufficient ephemeral storage to worker VMs.
+  worker_ephemeral_disk: 50GB_ephemeral_disk # consider 200GB for production systems
+  storage_driver: overlay # prevent the default 'detect' to resolve to the problematic 'btrfs'
+  log_level: info # set this to 'debug' whenever necessary
+
+
+  # Reference declarations
+
+  network_name: concourse-network
+
+  web_ip0: 10.244.16.67
+  web_ip1: 10.244.16.68
+  atc_tls_bind_port: 4443
+  web_network_vm_extension: (( prune ))
+
+  credhub_ip0: 10.244.16.83
+  credhub_ip1: 10.244.16.84
+  credhub_tls_port: 8844
+
+  uaa_ip0: 10.244.16.99
+  uaa_ip1: 10.244.16.100
+  uaa_tls_port: 8443
+
+
+
+imported_vars:
+  - subsys: traefik
+    imports:
+
+      - name: stemcell_os
+        from: depl-vars
+        path: /stemcell_os
+      - name: stemcell_version
+        from: depl-vars
+        path: /stemcell_version
+      - name: stemcell_sha1
+        from: depl-vars
+        path: /stemcell_sha1
+
+      - name: traefik_ca_cert
+        from: depl-creds
+        path: /traefik_ca/certificate

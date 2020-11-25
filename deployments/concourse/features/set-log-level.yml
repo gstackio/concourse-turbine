@@ -1,0 +1,9 @@
+---
+
+- path: /instance_groups/name=web/jobs/name=web/properties/log_level?
+  type: replace
+  value: ((log_level))
+
+- path: /instance_groups/name=worker/jobs/name=worker/properties?/log_level
+  type: replace
+  value: ((log_level))

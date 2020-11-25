@@ -1,0 +1,31 @@
+---
+
+- path: /disk_types/name=100MB?
+  type: replace
+  value:
+    name: 100MB
+    disk_size: 100
+
+- path: /disk_types/name=500MB?
+  type: replace
+  value:
+    name: 500MB
+    disk_size: 500
+
+- path: /disk_types/name=2GB?
+  type: replace
+  value:
+    name: 2GB
+    disk_size: 2048
+
+- path: /disk_types/name=20GB?
+  type: replace
+  value:
+    name: 20GB
+    disk_size: 20480
+
+- path: /disk_types/name=50GB?
+  type: replace
+  value:
+    name: 50GB
+    disk_size: 51200

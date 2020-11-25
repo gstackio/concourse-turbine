@@ -1,0 +1,83 @@
+---
+subsys:
+  name: concourse-garden-env
+  type: bosh-environment
+
+input_resources:
+  - name: bosh-deployment
+    type: git
+    uri: https://github.com/cloudfoundry/bosh-deployment.git
+    version: "5ef43d7" # BOSH v270.12.0 (as of Apr 11th, 2020)
+
+
+infra_vars:
+  alias: vbox # the Bosh CLI alias
+  iaas: virtualbox # the GBE environment flavor
+
+dns:
+  zone: prototyp.it
+  subdomain: easyfoundry
+
+
+main_deployment_file: bosh-deployment/bosh.yml
+
+operations_files:
+  10_bosh-deployment:
+    - virtualbox/cpi
+    - virtualbox/remote
+    - bosh-lite
+    - jumpbox-user
+  30_local:
+    - keep-bosh-agent
+    - custom-stemcell-version
+    - custom-bosh-version-precompiled
+    - set-disk-size
+    - scale-vm-size
+    - retain-garden-only
+
+variables_files:
+  10_local:
+    - file: secrets
+      example:
+        vbox_ssh:
+          private_key: |
+            -----BEGIN RSA PRIVATE KEY-----
+            ...
+            -----END RSA PRIVATE KEY-----
+
+
+deployment_vars:
+  disk_size: 220_000 # i.e. 220GB
+
+  external_ip: ~
+  vbox_host: ~
+  vbox_username: ~
+
+  routable_network_cidr: 10.244.0.0/16
+
+  # web_router_ip: "10.244.0.34" # classical Gorouter reverse-proxy
+  web_router_ip: "10.244.0.43" # Træfik reverse-proxy for Let's Encrypt support
+
+  internal_ip: "192.168.50.7"
+  internal_gw: "192.168.50.1"
+  internal_cidr: 192.168.50.0/24
+
+
+  # Versions
+
+  bosh_precompiled_version: "271.2.0"
+  bosh_precompiled_url: https://s3.amazonaws.com/bosh-compiled-release-tarballs/bosh-271.2.0-ubuntu-xenial-621.84-20200909-134751-25286893-20200909134752.tgz
+  bosh_precompiled_sha1: 6e234f26428b84f94398c66d36ed9e12c74d387e
+
+  stemcell_name: bosh-vsphere-esxi-ubuntu-xenial-go_agent
+  stemcell_version: "621.84"
+  stemcell_sha1: 8e6dd61fcad1560afec0415a762b725993d86b26
+
+
+imported_vars:
+  - subsys: concourse-bosh-env
+    imports:
+
+      - name: blobstore_ip
+        from: depl-vars
+        path: /internal_ip

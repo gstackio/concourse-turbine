@@ -1,0 +1,36 @@
+---
+subsys:
+  name: cloud-config
+  type: bosh-config
+
+input_resources: []
+
+
+main_config_file: ./conf/base-cloud-config.yml
+
+# As an alternative, we could use the default cloud config provided as an
+# example for BOSH-Lite environments:
+#
+# main_config_file: bosh-deployment/warden/cloud-config.yml
+
+operations_files:
+  10_local:
+    - additional-disk-sizes
+    - set-compilation-workers
+    - traefik-support
+    - concourse-support
+
+
+config_vars:
+  # Note: we lower compilation workers a little bit for our 7-cores test
+  # environment, whose load raises up to 17+ when running cf-d compilations.
+  # Feel free to add more workers for environments with more cores.
+  compilation_workers: 5
+
+
+imported_vars:
+  - subsys: concourse
+    imports:
+      - name: concourse_network
+        from: depl-vars
+        path: /network_name
