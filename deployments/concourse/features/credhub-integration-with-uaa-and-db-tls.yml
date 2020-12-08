@@ -272,6 +272,8 @@
             keys:
               key-1:
                 signingKey: ((uaa-jwt-signing-key.private_key))
+          refresh:
+            format: opaque
         logging_level: ((log_level))
       uaadb:
         port: 5432
@@ -530,10 +532,10 @@
 
 - path: /instance_groups/name=db/jobs/name=postgres/properties/databases/tls?
   type: replace
-  value: ((database-tls))
-    # ca: ((database-tls.ca))
-    # certificate: ((database-tls.certificate))
-    # private_key: ((database-tls.private_key))
+  value: # ((database-tls)) # <-- woud work with --vars-store, but doesn't with Credhub
+    ca: ((database-tls.ca))
+    certificate: ((database-tls.certificate))
+    private_key: ((database-tls.private_key))
 
 
 - path: /variables/name=database-tls?
