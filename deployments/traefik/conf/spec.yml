@@ -111,3 +111,9 @@ imported_vars:
       - name: uaa_tls_port
         from: depl-vars
         path: /uaa_tls_port
+
+  - subsys: harbor
+    imports:
+      - name: harbor_ip0
+        from: depl-vars
+        path: /static_ip

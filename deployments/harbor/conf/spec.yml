@@ -34,6 +34,7 @@ operations_files:
     - set-update-rules
     - use-uaa-authentication
     - workaround-erroneous-harbor-link-spec
+    - static-ip
 
 variables_files:
   10_local:
@@ -67,6 +68,7 @@ deployment_vars:
   # Reference declarations
 
   network_name: harbor-network
+  static_ip: 10.244.20.10
 
 
 

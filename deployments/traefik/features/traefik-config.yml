@@ -84,6 +84,12 @@
             hostname = "uaa.((concourse_external_host))"
 
 
+        [backends.harbor-tls-backend]
+          [backends.harbor-tls-backend.servers]
+            [backends.harbor-tls-backend.servers.harbor0-tls]
+            url = "https://((harbor_ip0))"
+
+
       [frontends]
         [frontends.traefik-api]
         entrypoints = [ "https" ]
@@ -116,4 +122,12 @@
         passHostHeader = true
           [frontends.uaa-tls-frontend.routes.uaa-main]
           rule = "Host: uaa.((concourse_external_host))"
+
+        [frontends.harbor-tls-frontend]
+        entrypoints = [ "https" ]
+        priority = 20
+        backend = "harbor-tls-backend"
+        passHostHeader = true
+          [frontends.harbor-tls-frontend.routes.harbor-main]
+          rule = "Host: harbor.((concourse_external_host))"
     watch: true
