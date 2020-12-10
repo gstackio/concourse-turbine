@@ -147,7 +147,7 @@
           uaa:
             enabled: true
             url: https://uaa.((external_host))
-            internal_url: https://uaa.service.concourse.internal:((uaa_tls_port))
+            internal_url: https://((uaa_internal_hostname)):((uaa_tls_port))
             ca_certs:
               - ((uaa-tls.ca))
         data_storage:
@@ -229,7 +229,7 @@
 - path: /addons?/name=bosh-dns-aliases/jobs/name=bosh-dns-aliases/properties?/aliases/-
   type: replace
   value:
-    domain: &uaa_service_address uaa.service.concourse.internal
+    domain: &uaa_service_address ((uaa_internal_hostname))
     targets:
       - query: '*'
         instance_group: uaa

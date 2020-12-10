@@ -1,0 +1,116 @@
+---
+subsys:
+  name: harbor
+  type: bosh-deployment
+
+input_resources:
+  - name: harbor-boshrelease
+    type: git
+    # uri: https://github.com/vmware/harbor-boshrelease.git
+    # version: v1.8.2
+
+    # NOTE: we unfortunately had to fork the BOSH Release in order to fix some
+    # blocking issues with cgoups initialization in BOSH-Lite. Then the BOSH
+    # Release has to be created and uploaded specifically with 'bosh
+    # create-release' and 'bosh upload-release' invocations.
+    #
+    # Fortunately the 'pre-deploy' hook here in this Turbine subsystem will
+    # automate the job for you. Be prepared to download/upload 1GB of data
+    # though!
+    uri: https://github.com/gstackio/harbor-boshrelease.git
+    version: fixed-v1.8.2
+
+
+main_deployment_file: harbor-boshrelease/manifests/harbor.yml
+
+
+operations_files:
+  10_local:
+    - rename-deployment-and-network
+    - pin-stemcell
+    - pin-versions
+    - set-azs
+    - scale-vms-and-disks
+    - set-update-rules
+    - use-uaa-authentication
+    - workaround-erroneous-harbor-link-spec
+
+variables_files:
+  10_local:
+    - file: private-config
+      example:
+        # User-facing settings
+        harbor_domain: ci.example.com
+
+
+deployment_vars:
+  deployment_name: harbor
+
+
+  # Scaling
+
+  harbor_vm_type: default
+  ephemeral_disk_vm_extension: 10GB_ephemeral_disk
+  persistent_disk_type: 20GB
+
+
+  # Versions
+
+  harbor_version: latest
+  # harbor_version: "1.8.2"
+  # harbor_sha1: 28a3fdf5c842cf4a3de003a8066687aed8201da7
+
+  # stemcell_os:      # imported below
+  # stemcell_version: # imported below
+
+
+  # Reference declarations
+
+  network_name: harbor-network
+
+
+
+imported_vars:
+  - subsys: harbor
+    imports:
+      # NOTE: the following auto-import is actually a trick in order to inject
+      # a value from private-config.yml into a templated value for the
+      # 'hostname' deployment variable.
+      - name: hostname
+        from: vars-file
+        file: private-config
+        value: harbor.((harbor_domain))
+
+  - subsys: concourse
+    imports:
+      - name: uaa_deployment_name
+        from: depl-vars
+        path: /deployment_name
+      - name: uaa_network_name
+        from: depl-vars
+        path: /network_name
+      - name: uaa_admin_client_secret
+        from: depl-creds
+        path: /uaa-admin-client-secret
+      - name: uaa_internal_hostname
+        from: depl-vars
+        path: /uaa_internal_hostname
+      - name: uaa_tls_port
+        from: depl-vars
+        path: /uaa_tls_port
+
+      - name: default_ca
+        from: depl-creds
+        path: /concourse-internal-ca
+
+  - subsys: traefik
+    imports:
+
+      # Versions
+
+      - name: stemcell_os
+        from: depl-vars
+        path: /stemcell_os
+      - name: stemcell_version
+        from: depl-vars
+        path: /stemcell_version

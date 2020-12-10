@@ -1,0 +1,39 @@
+---
+
+# - path: /instance_groups/name=harbor-app/jobs/name=harbor/properties/custom_provider_definitions?
+#   type: replace
+#   value:
+#     - name: harbor_reference
+#       type: harbor_conn
+#       properties:
+#         - hostname
+#         - ui_url_protocol
+#         - admin_password
+#         # - admin_password_for_smoketest # we need to remove this non-existing property from the list
+#         - ssl.cert
+#         - ssl.key
+#         - ssl.ca
+#         - populate_etc_hosts
+
+# - path: /instance_groups/name=harbor-app/jobs/name=smoke-test/consumes/harbor_reference
+#   type: replace
+#   value:
+#     instances:
+#       - address: q-s0.harbor-app.((network_name)).((deployment_name)).bosh
+#     properties:
+#       hostname: ((hostname))
+#       ui_url_protocol: https
+#       admin_password: ((harbor_admin_password))
+#       admin_password_for_smoketest: ((harbor_admin_password))
+#       ssl:
+#         cert: ((harbor_ssl.certificate))
+#         key: ((harbor_ssl.private_key))
+#         ca: ((default_ca.certificate))
+#       populate_etc_hosts: false
+
+# - path: /instance_groups/name=harbor-app/jobs/name=smoke-test
+#   type: remove
+
+- path: /instance_groups/name=harbor-app/jobs/name=harbor/properties/admin_password_for_smoketest?
+  type: replace
+  value: ((harbor_admin_password))

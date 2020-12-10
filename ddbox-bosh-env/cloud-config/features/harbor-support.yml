@@ -1,0 +1,12 @@
+---
+
+- path: /networks/-
+  type: replace
+  value:
+    name: ((harbor_network))
+    subnets:
+      - azs: [ z1, z2, z3 ]
+        range: 10.244.20.0/24
+        gateway: 10.244.20.1
+        cloud_properties: { name: random }
+        static: [ 10.244.20.2 - 10.244.20.127 ]

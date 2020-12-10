@@ -38,6 +38,7 @@ operations_files:
     - static-credhub
     - static-uaa
     - scale-for-minimal-downtime-upgrades
+    - share-uaa-link
 
 
 variables_files:
@@ -103,6 +104,7 @@ deployment_vars:
 
   # Reference declarations
 
+  uaa_internal_hostname: uaa.service.concourse.internal
   network_name: concourse-network
 
   web_ip0: 10.244.16.67

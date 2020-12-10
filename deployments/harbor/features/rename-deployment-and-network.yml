@@ -1,0 +1,16 @@
+---
+
+- path: /name
+  type: replace
+  value: ((deployment_name))
+
+- path: /addons/name=harbor-bosh-dns/jobs/name=harbor-dns-aliases/properties/aliases
+  type: replace
+  value:
+    ((hostname)):
+      - "*.harbor-app.((network_name)).((deployment_name)).bosh"
+
+- path: /instance_groups/name=harbor-app/networks/name=deployment-network
+  type: replace
+  value:
+    name: ((network_name))

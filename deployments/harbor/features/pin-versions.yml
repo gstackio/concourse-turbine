@@ -1,0 +1,15 @@
+---
+
+# - path: /releases/name=harbor-container-registry
+#   type: replace
+#   value:
+#     name: harbor-container-registry
+#     version: ((harbor_version))
+#     url: https://bosh.io/d/github.com/vmware/harbor-boshrelease?v=((harbor_version))
+#     sha1: ((harbor_sha1))
+
+- path: /releases/name=harbor-container-registry
+  type: replace
+  value:
+    name: harbor-container-registry
+    version: ((harbor_version))

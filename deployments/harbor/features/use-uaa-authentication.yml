@@ -1,0 +1,30 @@
+---
+
+# - path: /addons/name=harbor-bosh-dns/jobs/name=harbor-dns-aliases/properties/aliases/((uaa_internal_hostname))?
+#   type: replace
+#   value:
+#     - "*.uaa.((uaa_network_name)).((uaa_deployment_name)).bosh"
+
+
+- path: /instance_groups/name=harbor-app/jobs/name=harbor/properties/auth_mode?
+  type: replace
+  value: uaa_auth
+
+- path: /instance_groups/name=harbor-app/jobs/name=harbor/properties/uaa?
+  type: replace
+  value:
+    url: https://((uaa_internal_hostname)):((uaa_tls_port))
+    ca_cert: |
+      ((default_ca.certificate))
+    client_id: harbor-client
+    client_secret: ((harbor_uaa_client_secret))
+    admin:
+      client_id: admin
+      client_secret: ((uaa_admin_client_secret))
+
+
+- path: /variables/name=harbor_uaa_client_secret?
+  type: replace
+  value:
+    name: harbor_uaa_client_secret
+    type: password

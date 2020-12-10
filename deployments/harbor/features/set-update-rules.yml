@@ -1,0 +1,9 @@
+---
+
+- path: /update
+  type: replace
+  value:
+    canaries: 1
+    max_in_flight: 1
+    canary_watch_time: 5000-300000
+    update_watch_time: 5000-300000

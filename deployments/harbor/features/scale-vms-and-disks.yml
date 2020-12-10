@@ -1,0 +1,23 @@
+---
+
+- path: /instance_groups/name=harbor-app/vm_type?
+  type: replace
+  value: ((harbor_vm_type))
+
+
+
+- path: /instance_groups/name=harbor-app/persistent_disk
+  type: remove
+
+- path: /instance_groups/name=harbor-app/persistent_disk_type?
+  type: replace
+  value: ((persistent_disk_type))
+
+
+
+- path: /instance_groups/name=harbor-app/vm_resources
+  type: remove
+
+- path: /instance_groups/name=harbor-app/vm_extensions?/-
+  type: replace
+  value: ((ephemeral_disk_vm_extension))

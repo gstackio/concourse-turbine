@@ -1,0 +1,5 @@
+---
+
+- path: /instance_groups/name=harbor-app/azs
+  type: replace
+  value: [ z1 ]

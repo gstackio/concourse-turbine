@@ -1,0 +1,15 @@
+---
+
+- path: /instance_groups/name=uaa/jobs/name=uaa/custom_provider_definitions?
+  type: replace
+  value:
+    - name: uaa-address
+      type: address
+
+- path: /instance_groups/name=uaa/jobs/name=uaa/provides?/uaa-address
+  type: replace
+  value:
+    shared: true
+    aliases:
+      - domain: ((uaa_internal_hostname))
+        health_filter: smart

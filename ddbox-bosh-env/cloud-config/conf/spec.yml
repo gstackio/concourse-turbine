@@ -19,6 +19,7 @@ operations_files:
     - set-compilation-workers
     - traefik-support
     - concourse-support
+    - harbor-support
 
 
 config_vars:
@@ -32,5 +33,10 @@ imported_vars:
   - subsys: concourse
     imports:
       - name: concourse_network
+        from: depl-vars
+        path: /network_name
+  - subsys: harbor
+    imports:
+      - name: harbor_network
         from: depl-vars
         path: /network_name

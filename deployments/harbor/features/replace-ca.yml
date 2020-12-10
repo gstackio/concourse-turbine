@@ -1,0 +1,19 @@
+---
+
+- path: /variables/name=default_ca
+  type: remove
+
+- path: /variables/name=harbor_ssl
+  type: replace
+  value:
+    name: harbor_ssl
+    type: certificate
+    options:
+      ca: default_ca
+      common_name: ((hostname))
+      alternative_names:
+        - ((hostname))
+        - "*.harbor-app.((network_name)).((deployment_name)).bosh"
+    consumes:
+      alternative_name: { from: harbor }
+    update_mode: converge
