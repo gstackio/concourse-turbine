@@ -260,6 +260,25 @@
                 - scim.read
                 - credhub.read
                 - credhub.write
+        user:
+          # Reduce the list of default authorities/scopes/groups assigned to
+          # all users:
+          authorities:
+            - openid
+            - scim.me
+            # - cloud_controller.read
+            # - cloud_controller.write
+            # - cloud_controller_service_permissions.read
+            - password.write
+            - uaa.user
+            - approvals.me
+            - oauth.approvals
+            # - notification_preferences.read
+            # - notification_preferences.write
+            - profile
+            - roles
+            - user_attributes
+            - uaa.offline_token
         admin: { client_secret: ((uaa-admin-client-secret)) }
         login: { client_secret: ((uaa-login-client-secret)) }
         zones: { internal: { hostnames: [ "uaa.((external_host))", *uaa_service_address ] } }
