@@ -30,12 +30,28 @@ function main() {
     credhub get --name "/concourse/main/team-var"
     credhub get --name "/concourse/main/${pipeline_name}/pipeline-var"
 
-    fly -t "${concourse_target}" set-pipeline -n -p "${pipeline_name}" -c <(pipeline_definition)
+    credhub set --name "/concourse/main/${pipeline_name}/harbor-admin-password" --type "value" \
+        --value "$(harbor_creds_var "/harbor_admin_password")"
 
-    fly -t "${concourse_target}" unpause-pipeline -p "${pipeline_name}"
+    local concourse_fqdn  harbor_fqdn  credhub_fqdn
+    concourse_fqdn=$(priv_cfg_var "/external_host")
+    harbor_fqdn="harbor.${concourse_fqdn}"
+    credhub_fqdn="credhub.${concourse_fqdn}"
+    fly --target="${concourse_target}" set-pipeline --non-interactive \
+        --pipeline="${pipeline_name}" \
+        --config=<(pipeline_definition) \
+        --var="registry_prefix=${harbor_fqdn}/" \
+        --var="credhub_server=https://${credhub_fqdn}"
 
-    fly -t "${concourse_target}" trigger-job -j "${pipeline_name}/test-job" -w
+    fly --target="${concourse_target}" unpause-pipeline \
+        --pipeline="${pipeline_name}"
 
+    fly --target="${concourse_target}" trigger-job --watch \
+        --job="${pipeline_name}/test-job"
+
+    # NOTE: we must exit from within this main() function, so that local vars
+    # 'concourse_target' and 'pipeline_name' can still be defined in the
+    # cleanup() function.
     exit 0
 }
 
@@ -50,6 +66,7 @@ function cleanup() {
 
     credhub delete --name "/concourse/main/team-var"
     credhub delete --name "/concourse/main/${pipeline_name}/pipeline-var"
+    credhub delete --name "/concourse/main/${pipeline_name}/harbor-admin-password"
 }
 
 function pipeline_definition() {
@@ -64,7 +81,9 @@ resources:
   - name: test-image
     type: docker-image
     source:
-      repository: ubuntu
+      repository: ((registry_prefix))gstack/gk-ops
+      username: admin
+      password: ((harbor-admin-password))
 
 jobs:
   - name: test-job
@@ -73,15 +92,12 @@ jobs:
       - get: test-image
       - task: test-task
         image: test-image
-        params:
-          TEAM_VAR: ((team-var))
-          PIPELINE_VAR: ((pipeline-var))
         config:
           platform: linux
-
           params:
-            TEAM_VAR:     changeme
-            PIPELINE_VAR: changeme
+            TEAM_VAR: ((team-var))
+            PIPELINE_VAR: ((pipeline-var))
+            CREDHUB_SERVER: ((credhub_server))
           run:
             path: bash
             args:
@@ -100,8 +116,28 @@ jobs:
                 if [[ "${error}" -gt 0 ]]; then
                     exit 1
                 fi
+                (
+                    set -x
+                    credhub api       # checks connectivity from workers to Credhub
+                    credhub --version
+                )
                 echo "$(tput setaf 5)$(tput bold)Concourse rocks"\!"$(tput sgr0)"
 EOF
+}
+
+function priv_cfg_var() {
+    local path=$1
+    bosh int "${SUBSYS_DIR}/conf/private-config.yml" --path "${path}"
+}
+
+function state_var() {
+    local state_file=$1
+    local path=$2
+    bosh int "${BASE_DIR}/state/${SUBSYS_NAME}/${state_file}.yml" --path "${path}"
+}
+
+function harbor_creds_var() {
+    SUBSYS_NAME="harbor" state_var "depl-creds" "$1"
 }
 
 main "$@"
