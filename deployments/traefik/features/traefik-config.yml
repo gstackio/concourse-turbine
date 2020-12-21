@@ -37,7 +37,7 @@
             port = ((concourse_tls_port))
             interval = "20s"
             scheme = "https"
-            hostname = "((concourse_external_host))"
+            hostname = "((concourse_external_domain))"
 
 
         [backends.credhub-tls-backend]
@@ -59,7 +59,7 @@
             port = ((credhub_tls_port))
             interval = "20s"
             scheme = "https"
-            hostname = "credhub.((concourse_external_host))"
+            hostname = "credhub.((concourse_external_domain))"
 
 
         [backends.uaa-tls-backend]
@@ -81,7 +81,7 @@
             port = ((uaa_tls_port))
             interval = "20s"
             scheme = "https"
-            hostname = "uaa.((concourse_external_host))"
+            hostname = "uaa.((concourse_external_domain))"
 
 
         [backends.harbor-tls-backend]
@@ -105,7 +105,7 @@
         backend = "concourse-tls-backend"
         passHostHeader = true
           [frontends.concourse-tls-frontend.routes.atc-main]
-          rule = "Host: ((concourse_external_host))"
+          rule = "Host: ((concourse_external_domain))"
 
         [frontends.credhub-tls-frontend]
         entrypoints = [ "https" ]
@@ -113,7 +113,7 @@
         backend = "credhub-tls-backend"
         passHostHeader = true
           [frontends.credhub-tls-frontend.routes.credhub-main]
-          rule = "Host: credhub.((concourse_external_host))"
+          rule = "Host: credhub.((concourse_external_domain))"
 
         [frontends.uaa-tls-frontend]
         entrypoints = [ "https" ]
@@ -121,7 +121,7 @@
         backend = "uaa-tls-backend"
         passHostHeader = true
           [frontends.uaa-tls-frontend.routes.uaa-main]
-          rule = "Host: uaa.((concourse_external_host))"
+          rule = "Host: uaa.((concourse_external_domain))"
 
         [frontends.harbor-tls-frontend]
         entrypoints = [ "https" ]
@@ -129,5 +129,5 @@
         backend = "harbor-tls-backend"
         passHostHeader = true
           [frontends.harbor-tls-frontend.routes.harbor-main]
-          rule = "Host: harbor.((concourse_external_host))"
+          rule = "Host: harbor.((concourse_external_domain))"
     watch: true

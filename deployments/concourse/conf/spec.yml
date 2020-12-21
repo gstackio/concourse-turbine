@@ -38,7 +38,6 @@ operations_files:
     - static-credhub
     - static-uaa
     - scale-for-minimal-downtime-upgrades
-    - share-uaa-link
 
 
 variables_files:
@@ -52,7 +51,7 @@ variables_files:
     - file: private-config
       example:
         # User-facing settings
-        external_host: ci.example.com
+        external_domain: ci.example.com
         atc_basic_auth_username: admin
 
 
@@ -67,9 +66,6 @@ deployment_vars:
 
   os_conf_version: "22.1.0"
   os_conf_sha1: 7ef05f6f3ebc03f59ad8131851dbd1abd1ab3663
-
-  bosh_dns_aliases_version: "0.0.3"
-  bosh_dns_aliases_sha1: b0d0a0350ed87f1ded58b2ebb469acea0e026ccc
 
   credhub_version: "2.9.0"
   credhub_sha1: 36d3a92588c33bc3a7ce54cd4714c96cc7d1bee2
@@ -104,7 +100,6 @@ deployment_vars:
 
   # Reference declarations
 
-  uaa_internal_hostname: uaa.service.concourse.internal
   network_name: concourse-network
 
   web_ip0: 10.244.16.67
@@ -123,6 +118,23 @@ deployment_vars:
 
 
 imported_vars:
+  - subsys: concourse
+    imports:
+      # Note: thses are actually an auto-import trick in order to inject a
+      # value from private-config.yml into other variables.
+      - name: external_host # required by 'cluster/operations/tls-vars'
+        from: vars-file
+        file: private-config
+        value: ((external_domain))
+      - name: uaa_external_fqdn
+        from: vars-file
+        file: private-config
+        value: uaa.((external_domain))
+      - name: credhub_external_fqdn
+        from: vars-file
+        file: private-config
+        value: credhub.((external_domain))
+
   - subsys: traefik
     imports:
 

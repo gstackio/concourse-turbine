@@ -28,14 +28,6 @@
     url: https://bosh.io/d/github.com/cloudfoundry-incubator/bpm-release?v=((bpm_version))
     sha1: ((bpm_sha1))
 
-- path: /releases/name=bosh-dns-aliases?
-  type: replace
-  value:
-    name: bosh-dns-aliases
-    version: ((bosh_dns_aliases_version))
-    url: https://bosh.io/d/github.com/cloudfoundry/bosh-dns-aliases-release?v=((bosh_dns_aliases_version))
-    sha1: ((bosh_dns_aliases_sha1))
-
 - path: /releases/name=os-conf?
   type: replace
   value:
@@ -55,13 +47,6 @@
     jobs:
       - name: bpm
         release: bpm
-
-- path: /addons/name=bosh-dns-aliases?/jobs/name=bosh-dns-aliases/release
-  type: replace
-  # Note: we use this trick here, for defining 'name:' and 'release:' keys
-  # only, in order to define the addon without clobbering any previously-
-  # defined aliases properties.
-  value: bosh-dns-aliases
 
 - path: /addons/name=trusted-ca-certs?
   type: replace
@@ -120,34 +105,31 @@
     url: https://bosh.io/d/github.com/pivotal-cf/credhub-release?v=((credhub_version))
     sha1: ((credhub_sha1))
 
-- path: /addons?/name=bosh-dns-aliases/jobs/name=bosh-dns-aliases/properties?/aliases/-
-  type: replace
-  value:
-    domain: &credhub_service_address credhub.service.concourse.internal
-    targets:
-    - query: '*'
-      instance_group: credhub
-      deployment: ((deployment_name))
-      network: ((network_name))
-      domain: bosh
-
 - path: /instance_groups/name=credhub/jobs?/name=credhub
   type: replace
   value:
     name: credhub
     release: credhub
+    provides:
+      credhub-address:
+        aliases:
+          - domain: ((credhub_external_fqdn))
+            health_filter: smart
+    custom_provider_definitions:
+      - name: credhub-address
+        type: address
     properties:
       bpm: { enabled: true }
       credhub:
         port: ((credhub_tls_port)) # explicit that value for the glue below to stick
         tls: ((credhub-tls))
-        internal_url: *credhub_service_address # this is for other instance groups to auto-configure through the 'credhub' BOSH link
-        ca_certificate: ((credhub-tls.ca))     # this is for other instance groups to auto-configure through the 'credhub' BOSH link
+        internal_url: ((credhub_external_fqdn)) # this is for other instance groups to auto-configure through the 'credhub' BOSH link
+        ca_certificate: ((credhub-tls.ca))      # this is for other instance groups to auto-configure through the 'credhub' BOSH link
         authentication:
           uaa:
             enabled: true
-            url: https://uaa.((external_host))
-            internal_url: https://((uaa_internal_hostname)):((uaa_tls_port))
+            url: https://((uaa_external_fqdn))
+            internal_url: https://((uaa_external_fqdn)):((uaa_tls_port))
             ca_certs:
               - ((uaa-tls.ca))
         data_storage:
@@ -195,9 +177,9 @@
     type: certificate
     options:
       ca: concourse-internal-ca
-      common_name: *credhub_service_address
+      common_name: ((credhub_external_fqdn))
       alternative_names:
-        - *credhub_service_address
+        - ((credhub_external_fqdn))
     update_mode: converge
 
 - path: /variables/name=credhub-database-password?
@@ -226,28 +208,25 @@
     url: https://bosh.io/d/github.com/cloudfoundry/uaa-release?v=((uaa_version))
     sha1: ((uaa_sha1))
 
-- path: /addons?/name=bosh-dns-aliases/jobs/name=bosh-dns-aliases/properties?/aliases/-
-  type: replace
-  value:
-    domain: &uaa_service_address ((uaa_internal_hostname))
-    targets:
-      - query: '*'
-        instance_group: uaa
-        deployment: ((deployment_name))
-        network: ((network_name))
-        domain: bosh
-
 - path: /instance_groups/name=uaa/jobs?/name=uaa?
   type: replace
   value:
     name: uaa
     release: uaa
+    provides:
+      uaa-address:
+        aliases:
+          - domain: ((uaa_external_fqdn))
+            health_filter: smart
+    custom_provider_definitions:
+      - name: uaa-address
+        type: address
     consumes:
       database: { from: postgres }
     properties:
       bpm: { enabled: false } # conflicts with the '/home/vcap/.postgresql/root.crt' workaround below
       uaa:
-        url: https://uaa.((external_host))
+        url: https://((uaa_external_fqdn))
         ssl:
           port: ((uaa_tls_port)) # explicit that value for the glue below to stick
         catalina_opts: "-Djava.security.egd=file:/dev/./urandom -Xms384m -Xmx384m -XX:MaxMetaspaceSize=256m"
@@ -281,7 +260,7 @@
             - uaa.offline_token
         admin: { client_secret: ((uaa-admin-client-secret)) }
         login: { client_secret: ((uaa-login-client-secret)) }
-        zones: { internal: { hostnames: [ "uaa.((external_host))", *uaa_service_address ] } }
+        zones: { internal: { hostnames: [ ((uaa_external_fqdn)) ] } }
         sslCertificate: ((uaa-tls.certificate))
         sslPrivateKey: ((uaa-tls.private_key))
         jwt:
@@ -357,9 +336,9 @@
     type: certificate
     options:
       ca: concourse-internal-ca
-      common_name: *uaa_service_address
+      common_name: ((uaa_external_fqdn))
       alternative_names:
-        - *uaa_service_address
+        - ((uaa_external_fqdn))
     update_mode: converge
 
 - path: /variables/name=uaa-admin-client-secret?
@@ -423,7 +402,7 @@
       - uaa-client:credhub-admin
     operations: [ read, write, delete, read_acl, write_acl ]
 
-- path: /variables/-
+- path: /variables/name=credhub-admin-client-secret?
   type: replace
   value:
     name: credhub-admin-client-secret
@@ -440,7 +419,7 @@
   type: replace
   value:
     path_prefix: /concourse
-    url: https://credhub.service.concourse.internal:((credhub_tls_port))
+    url: https://((credhub_external_fqdn)):((credhub_tls_port))
     tls:
       ca_cert:
         certificate: ((concourse-internal-ca.certificate))

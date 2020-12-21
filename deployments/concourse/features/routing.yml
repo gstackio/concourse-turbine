@@ -1,5 +1,34 @@
 ---
 
+# Internally, we expose 'web' onto the same FQDN as externally, but the name
+# will be resolved to the private IPs bu BOSH DNS, acting as a BOSH-native
+# 'split DNS' feature.
+
+- path: /instance_groups/name=web/jobs/name=web/custom_provider_definitions?/name=web-address
+  type: replace
+  value:
+    name: web-address
+    type: address
+
+- path: /instance_groups/name=web/jobs/name=web/provides?/web-address
+  type: replace
+  value:
+    shared: true
+    aliases:
+      - domain: ((external_host))
+        health_filter: smart
+
+- path: /instance_groups/name=uaa/jobs/name=uaa/provides/uaa-address/shared?
+  type: replace
+  value: true
+
+- path: /instance_groups/name=credhub/jobs/name=credhub/provides/credhub-address/shared?
+  type: replace
+  value: true
+
+
+# Externally, 'web' is exposed onto the Traefik reverse proxy.
+
 - path: /instance_groups/name=web/jobs/name=web/properties/external_url
   type: replace
   value: https://((external_host))

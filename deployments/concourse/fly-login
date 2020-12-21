@@ -5,8 +5,8 @@ set -euo pipefail
 function main() {
     setup
 
-    local external_host atc_username atc_password default_concourse_target
-    external_host=$(priv_cfg_var "/external_host")
+    local concourse_fqdn atc_username atc_password default_concourse_target
+    concourse_fqdn=$(priv_cfg_var "/external_domain")
     atc_username=$(priv_cfg_var "/atc_basic_auth_username")
     atc_password=$(creds_var "/atc_basic_auth_password")
 
@@ -23,7 +23,7 @@ function main() {
     # solve the version mismatch.
     set +e
     "${BASE_DIR}/bin/fly" --target="${concourse_target}" login --insecure \
-        --concourse-url="https://${external_host}" \
+        --concourse-url="https://${concourse_fqdn}" \
         --username="${atc_username}" --password="${atc_password}" \
         "$@"
     login_status=$?
@@ -36,7 +36,7 @@ function main() {
         # mismatch that would be solved by the 'fly sync' above.
         set +e
         "${BASE_DIR}/bin/fly" --target="${concourse_target}" login --insecure \
-            --concourse-url="https://${external_host}" \
+            --concourse-url="https://${concourse_fqdn}" \
             --username="${atc_username}" --password="${atc_password}" \
             "$@"
         login_status=$?

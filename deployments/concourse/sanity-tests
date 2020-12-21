@@ -30,18 +30,20 @@ function main() {
     credhub get --name "/concourse/main/team-var"
     credhub get --name "/concourse/main/${pipeline_name}/pipeline-var"
 
-    credhub set --name "/concourse/main/${pipeline_name}/harbor-admin-password" --type "value" \
-        --value "$(harbor_creds_var "/harbor_admin_password")"
+    (
+        set +x
+        credhub set --name "/concourse/main/${pipeline_name}/harbor-admin-password" --type "value" \
+            --value "$(harbor_creds_var "/harbor_admin_password")"
+    )
 
-    local concourse_fqdn  harbor_fqdn  credhub_fqdn
-    concourse_fqdn=$(priv_cfg_var "/external_host")
-    harbor_fqdn="harbor.${concourse_fqdn}"
-    credhub_fqdn="credhub.${concourse_fqdn}"
+    local external_domain  harbor_fqdn
+    external_domain=$(priv_cfg_var "/external_domain")
+    harbor_fqdn="harbor.${external_domain}"
     fly --target="${concourse_target}" set-pipeline --non-interactive \
         --pipeline="${pipeline_name}" \
         --config=<(pipeline_definition) \
         --var="registry_prefix=${harbor_fqdn}/" \
-        --var="credhub_server=https://${credhub_fqdn}"
+        --var="credhub_server=${CREDHUB_SERVER}"
 
     fly --target="${concourse_target}" unpause-pipeline \
         --pipeline="${pipeline_name}"

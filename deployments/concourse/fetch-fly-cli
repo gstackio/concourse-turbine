@@ -5,12 +5,12 @@ set -eo pipefail
 function main() {
     setup
 
-    external_host=$(priv_cfg_var "/external_host")
+    concourse_fqdn=$(priv_cfg_var "/external_domain")
     platform=$(uname -s | tr "[:upper:]" "[:lower:]")
 
     set -x
 
-    curl -fsSL -k "https://${external_host}/api/v1/cli?arch=amd64&platform=${platform}" \
+    curl -fsSL -k "https://${concourse_fqdn}/api/v1/cli?arch=amd64&platform=${platform}" \
         -o "${BASE_DIR}/bin/fly"
     chmod +x "${BASE_DIR}/bin/fly"
 }

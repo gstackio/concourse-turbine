@@ -5,15 +5,15 @@ set -euo pipefail
 function main() {
     setup
 
-    local external_host # credhub_ip credhub_port
-    external_host=$(priv_cfg_var "/external_host")
+    local credhub_fqdn # credhub_ip credhub_port
+    credhub_fqdn="credhub.$(priv_cfg_var "/external_domain")"
     # credhub_ip=$(own_spec_var /deployment_vars/credhub_ip0) # or credhub_ip1
     # credhub_port=$(own_spec_var /deployment_vars/credhub_tls_port)
 
     echo "CREDHUB_CLIENT=\"credhub-admin\""
     echo "CREDHUB_SECRET=\"$(creds_var "/credhub-admin-client-secret")\""
     # echo "CREDHUB_SERVER=\"https://${credhub_ip}:${credhub_port}\""
-    echo "CREDHUB_SERVER=\"https://credhub.${external_host}\""
+    echo "CREDHUB_SERVER=\"https://${credhub_fqdn}\""
     cd "${SUBSYS_DIR}" || exit 115
     echo "CREDHUB_CA_CERT=\"$(creds_var "/concourse-internal-ca/certificate" &&
                         echo && ( creds_var "/concourse-external-ca/certificate" 2> /dev/null || true ) &&
