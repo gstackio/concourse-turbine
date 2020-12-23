@@ -24,6 +24,7 @@ operations_files:
     - scale-disk
     # - activate-debug
     - routing
+    - internal-split-dns
     - traefik-config
 
 variables_files:

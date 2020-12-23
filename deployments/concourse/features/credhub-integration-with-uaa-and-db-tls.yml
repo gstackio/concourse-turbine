@@ -57,7 +57,9 @@
         - uaa
         - credhub
         - web
-        - workers
+        # Note: enforcing trust of the Concourse CA at the system level
+        # doesn't have Concourse tasks containers trust the CA, though.
+        - worker
     jobs:
       - name: ca_certs
         release: os-conf
@@ -157,6 +159,37 @@
   type: replace
   value: 10000-120000
 
+- path: /instance_groups/name=credhub/jobs/name=traefik?
+  type: replace
+  value:
+    name: traefik
+    release: traefik
+    properties:
+      bpm:
+        enabled: true
+      traefik:
+        tls:
+          cert: ((credhub-tls))
+        accept_invalid_backend_certificates: false
+        http: { enabled: false }
+        access_logs: { enabled: true }
+        file:
+          enabled: true
+          watch: true
+          rules: |
+            [backends]
+              [backends.credhub-tls-backend.servers.credhub0-tls]
+              url = "https://((credhub_external_fqdn)):((credhub_tls_port))"
+
+            [frontends]
+              [frontends.credhub-tls-frontend]
+              entrypoints = [ "https" ]
+              backend = "credhub-tls-backend"
+              passHostHeader = true
+                [frontends.credhub-tls-frontend.routes.credhub-main]
+                rule = "Host: ((credhub_external_fqdn))"
+
+
 
 - path: /instance_groups/name=db/jobs/name=postgres/properties/databases/databases/-
   type: replace
@@ -208,7 +241,7 @@
     url: https://bosh.io/d/github.com/cloudfoundry/uaa-release?v=((uaa_version))
     sha1: ((uaa_sha1))
 
-- path: /instance_groups/name=uaa/jobs?/name=uaa?
+- path: /instance_groups/name=uaa/jobs?/name=uaa
   type: replace
   value:
     name: uaa
@@ -217,6 +250,8 @@
       uaa-address:
         aliases:
           - domain: ((uaa_external_fqdn))
+            health_filter: smart
+          - domain: ((login_external_fqdn))
             health_filter: smart
     custom_provider_definitions:
       - name: uaa-address
@@ -303,6 +338,49 @@
   value: 10000-120000
 
 
+- path: /releases/name=traefik?
+  type: replace
+  value:
+    name: traefik
+    version: 1.14.0
+    url: https://s3.eu-west-3.amazonaws.com/traefik-boshrelease/compiled-releases/traefik/traefik-1.14.0-ubuntu-xenial-621.90-20201028-225657-314747118-20201028225657.tgz
+    sha1: 32ae9bf8bf81fe5213a005a110219cd5b1f0f25f
+    stemcell:
+      os: ubuntu-xenial
+      version: "621.90"
+
+- path: /instance_groups/name=uaa/jobs/name=traefik?
+  type: replace
+  value:
+    name: traefik
+    release: traefik
+    properties:
+      bpm:
+        enabled: true
+      traefik:
+        tls:
+          cert: ((uaa-tls))
+        accept_invalid_backend_certificates: false
+        http: { enabled: false }
+        access_logs: { enabled: true }
+        file:
+          enabled: true
+          watch: true
+          rules: |
+            [backends]
+              [backends.uaa-tls-backend.servers.uaa0-tls]
+              url = "https://((uaa_external_fqdn)):((uaa_tls_port))"
+
+            [frontends]
+              [frontends.uaa-tls-frontend]
+              entrypoints = [ "https" ]
+              backend = "uaa-tls-backend"
+              passHostHeader = true
+                [frontends.uaa-tls-frontend.routes.uaa-main]
+                rule = "Host: ((uaa_external_fqdn)),((login_external_fqdn))"
+
+
+
 - path: /instance_groups/name=db/jobs/name=postgres/properties/databases/databases/-
   type: replace
   value:
@@ -339,6 +417,7 @@
       common_name: ((uaa_external_fqdn))
       alternative_names:
         - ((uaa_external_fqdn))
+        - ((login_external_fqdn))
     update_mode: converge
 
 - path: /variables/name=uaa-admin-client-secret?

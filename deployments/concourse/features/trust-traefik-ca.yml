@@ -45,4 +45,4 @@
         - uaa
         - credhub
         - web
-        - workers
+        - worker

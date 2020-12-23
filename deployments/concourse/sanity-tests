@@ -11,16 +11,24 @@ function main() {
 
     set -x
 
-    set +e
-    if ! fly -t "${concourse_target}" status; then
-        bash ${DEBUG:+"-x"} "${SUBSYS_DIR}/fly-login" "${concourse_target}"
-    fi
-    set -e
+    (
+        set +e
+        if ! fly -t "${concourse_target}" status; then
+            bash ${DEBUG:+"-x"} "${SUBSYS_DIR}/fly-login" "${concourse_target}"
+        fi
+    )
 
     set +x
     source <("${SUBSYS_DIR}/credhub-env")
     set -x
-    credhub login
+
+    echo "Checking correct authentication to Credhub."
+    local secrets_found
+    secrets_found=$(
+        credhub find --output-json \
+            | jq --raw-output '.credentials | length'
+    )
+    echo "OK: ${secrets_found} secrets found"
 
     trap cleanup EXIT
 
@@ -34,6 +42,8 @@ function main() {
         set +x
         credhub set --name "/concourse/main/${pipeline_name}/harbor-admin-password" --type "value" \
             --value "$(harbor_creds_var "/harbor_admin_password")"
+        credhub set --name "/concourse/main/${pipeline_name}/credhub-ca-cert" --type "value" \
+            --value "${CREDHUB_CA_CERT}"
     )
 
     local external_domain  harbor_fqdn
@@ -69,6 +79,7 @@ function cleanup() {
     credhub delete --name "/concourse/main/team-var"
     credhub delete --name "/concourse/main/${pipeline_name}/pipeline-var"
     credhub delete --name "/concourse/main/${pipeline_name}/harbor-admin-password"
+    credhub delete --name "/concourse/main/${pipeline_name}/credhub-ca-cert"
 }
 
 function pipeline_definition() {
@@ -100,6 +111,7 @@ jobs:
             TEAM_VAR: ((team-var))
             PIPELINE_VAR: ((pipeline-var))
             CREDHUB_SERVER: ((credhub_server))
+            CREDHUB_CA_CERT: ((credhub-ca-cert))
           run:
             path: bash
             args:

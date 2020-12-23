@@ -130,6 +130,10 @@ imported_vars:
         from: vars-file
         file: private-config
         value: uaa.((external_domain))
+      - name: login_external_fqdn
+        from: vars-file
+        file: private-config
+        value: login.((external_domain))
       - name: credhub_external_fqdn
         from: vars-file
         file: private-config

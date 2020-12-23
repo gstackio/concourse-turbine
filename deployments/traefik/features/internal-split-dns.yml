@@ -1,0 +1,24 @@
+---
+
+# BOSH DNS allows us to define locally DNS names that would be resolved to
+# public IPs externally. This is similat to the 'Split DNS' feature that
+# operators might use with their cloud providers, except that BOSH DNS is
+# portable and free.
+
+- path: /instance_groups/name=traefik/jobs/name=traefik/provides?/traefik-address
+  type: replace
+  value:
+    shared: true
+    aliases:
+      - domain: ((api_hostname))                        # Traefik external FQDN
+        health_filter: smart
+      # - domain: ((concourse_external_domain))         # Concourse external FQDN
+      #   health_filter: smart
+      # - domain: uaa.((concourse_external_domain))     # UAA external FQDN
+      #   health_filter: smart
+      # - domain: login.((concourse_external_domain))   # login server external FQDN
+      #   health_filter: smart
+      # - domain: credhub.((concourse_external_domain)) # Credhub external FQDN
+      #   health_filter: smart
+      - domain: harbor.((concourse_external_domain))  # Harbor external FQDN
+        health_filter: smart

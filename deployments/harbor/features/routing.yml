@@ -1,0 +1,18 @@
+---
+
+- path: /instance_groups/name=harbor-app/jobs/name=harbor/custom_provider_definitions?
+  type: replace
+  value:
+    - name: harbor-address
+      type: address
+
+# - path: /instance_groups/name=harbor-app/jobs/name=harbor/provides?/harbor-address
+#   type: replace
+#   value:
+#     shared: false
+#     aliases:
+#       - domain: ((hostname))
+#         health_filter: smart
+
+- path: /addons/name=harbor-bosh-dns
+  type: remove

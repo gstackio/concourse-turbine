@@ -123,6 +123,18 @@
           [frontends.uaa-tls-frontend.routes.uaa-main]
           rule = "Host: uaa.((concourse_external_domain))"
 
+          # NOTE: we didn't manage to add a second route here, even following
+          # the example found at:
+          # https://doc.traefik.io/traefik/v1.7/configuration/backends/file/
+
+        [frontends.login-tls-frontend]
+        entrypoints = [ "https" ]
+        priority = 20
+        backend = "uaa-tls-backend"
+        passHostHeader = true
+          [frontends.login-tls-frontend.routes.login-server]
+          rule = "Host: login.((concourse_external_domain))"
+
         [frontends.harbor-tls-frontend]
         entrypoints = [ "https" ]
         priority = 20

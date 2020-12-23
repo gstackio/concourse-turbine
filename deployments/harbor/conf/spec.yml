@@ -35,6 +35,7 @@ operations_files:
     - use-uaa-authentication
     - workaround-erroneous-harbor-link-spec
     - static-ip
+    - routing
 
 variables_files:
   10_local:
@@ -95,8 +96,9 @@ imported_vars:
         from: depl-creds
         path: /uaa-admin-client-secret
       - name: uaa_internal_hostname
-        from: depl-vars
-        path: /uaa_internal_hostname
+        from: vars-file
+        file: private-config
+        value: uaa.((external_domain))
       - name: uaa_tls_port
         from: depl-vars
         path: /uaa_tls_port

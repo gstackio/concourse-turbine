@@ -5,6 +5,7 @@ set -eo pipefail
 function main() {
     setup
 
+    local concourse_fqdn  platform
     concourse_fqdn=$(priv_cfg_var "/external_domain")
     platform=$(uname -s | tr "[:upper:]" "[:lower:]")
 
