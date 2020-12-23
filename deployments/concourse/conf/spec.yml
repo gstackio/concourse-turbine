@@ -7,7 +7,7 @@ input_resources:
   - name: concourse-deployment
     type: git
     uri: https://github.com/concourse/concourse-bosh-deployment.git
-    version: v5.8.1
+    version: v6.7.2
 
 
 sanity-tests:
@@ -70,10 +70,8 @@ deployment_vars:
   credhub_version: "2.9.0"
   credhub_sha1: 36d3a92588c33bc3a7ce54cd4714c96cc7d1bee2
 
-  uaa_version: "74.25.0"
-  uaa_sha1: 7eb46ce8d64d11e3bcfb52fc7c26c1e72085fd69
-  # uaa_version: "74.27.0"
-  # uaa_sha1: 8307934c9cba6c1885bf4c1647ace960d84a78a4
+  uaa_version: "74.29.0"
+  uaa_sha1: f75cb4967d8373529bf71ccd307a285041079ffb
 
   # stemcell_os:              # imported below
   # stemcell_version:         # imported below

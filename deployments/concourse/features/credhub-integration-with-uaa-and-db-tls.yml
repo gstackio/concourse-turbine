@@ -342,12 +342,12 @@
   type: replace
   value:
     name: traefik
-    version: 1.14.0
-    url: https://s3.eu-west-3.amazonaws.com/traefik-boshrelease/compiled-releases/traefik/traefik-1.14.0-ubuntu-xenial-621.90-20201028-225657-314747118-20201028225657.tgz
-    sha1: 32ae9bf8bf81fe5213a005a110219cd5b1f0f25f
+    version: 1.15.0
+    url: https://s3.eu-west-3.amazonaws.com/traefik-boshrelease/compiled-releases/traefik/traefik-1.15.0-ubuntu-xenial-621.95-20201223-155156-221627372-20201223155157.tgz
+    sha1: f074c19b4d235ef927f78dc07f93ac9b50f44fe0
     stemcell:
       os: ubuntu-xenial
-      version: "621.90"
+      version: "621.95"
 
 - path: /instance_groups/name=uaa/jobs/name=traefik?
   type: replace

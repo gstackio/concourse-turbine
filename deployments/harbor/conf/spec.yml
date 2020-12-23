@@ -62,6 +62,14 @@ deployment_vars:
   # harbor_version: "1.8.2"
   # harbor_sha1: 28a3fdf5c842cf4a3de003a8066687aed8201da7
 
+  # NOTE: we are stuck with this stemcell for Harbor, because re-creating the
+  # Harbor VM will have all the registry image and data lost, as Docker
+  # volumes are not properly mounted to the BOSH persistent storage in
+  # `/var/vcap/store`.
+  stemcell_name: bosh-warden-boshlite-ubuntu-xenial-go_agent
+  stemcell_os: ubuntu-xenial
+  stemcell_version: "621.84"
+  stemcell_sha1: 305497923033888fd8186aa257e15bc382f2067e
   # stemcell_os:      # imported below
   # stemcell_version: # imported below
 
@@ -107,14 +115,14 @@ imported_vars:
         from: depl-creds
         path: /concourse-internal-ca
 
-  - subsys: traefik
-    imports:
+  # - subsys: traefik
+  #   imports:
 
-      # Versions
+  #     # Versions
 
-      - name: stemcell_os
-        from: depl-vars
-        path: /stemcell_os
-      - name: stemcell_version
-        from: depl-vars
-        path: /stemcell_version
+  #     - name: stemcell_os
+  #       from: depl-vars
+  #       path: /stemcell_os
+  #     - name: stemcell_version
+  #       from: depl-vars
+  #       path: /stemcell_version
