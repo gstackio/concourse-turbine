@@ -53,6 +53,7 @@ function main() {
         --pipeline="${pipeline_name}" \
         --config=<(pipeline_definition) \
         --var="registry_prefix=${harbor_fqdn}/" \
+        --var="credhub_fqdn=credhub.${external_domain}" \
         --var="credhub_server=${CREDHUB_SERVER}"
 
     fly --target="${concourse_target}" unpause-pipeline \
@@ -132,6 +133,7 @@ jobs:
                 fi
                 (
                     set -x
+                    host ((credhub_fqdn))
                     credhub api       # checks connectivity from workers to Credhub
                     credhub --version
                 )
