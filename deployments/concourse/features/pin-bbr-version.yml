@@ -1,0 +1,9 @@
+---
+
+- path: /releases/name=backup-and-restore-sdk?
+  type: replace
+  value:
+    name: backup-and-restore-sdk
+    version: ((bbr_sdk_version))
+    url: https://bosh.io/d/github.com/cloudfoundry-incubator/backup-and-restore-sdk-release?v=((bbr_sdk_version))
+    sha1: ((bbr_sdk_sha1))

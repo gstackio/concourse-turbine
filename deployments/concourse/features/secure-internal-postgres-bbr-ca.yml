@@ -1,0 +1,5 @@
+---
+
+- path: /variables/name=postgres_client_tls/options/ca
+  type: replace
+  value: concourse-internal-ca
