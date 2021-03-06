@@ -59,7 +59,7 @@ jobs:
                     git status
                     git diff | cat
 
-                    git config --global "user.name" "((git-commit-name))"
+                    git config --global "user.name" "((git_commit_name))"
                     git config --global "user.email" "((git-commit-email))"
 
                     if [[ -z "$(git status --porcelain)" ]]; then
@@ -103,7 +103,7 @@ jobs:
           SPEC_FILE: deployments/concourse/conf/spec.yml
           YAML_PROP_PREFIX: os_conf
           RELEASE_HUMAN_NAME: OS Conf BOSH Release
-          GIT_COMMIT_NAME: ((git-commit-name))
+          GIT_COMMIT_NAME: ((git_commit_name))
           GIT_COMMIT_EMAIL: ((git-commit-email))
 
       - task: git-push
@@ -139,7 +139,7 @@ jobs:
           SPEC_FILE: deployments/concourse/conf/spec.yml
           YAML_PROP_PREFIX: credhub
           RELEASE_HUMAN_NAME: Credhub BOSH Release
-          GIT_COMMIT_NAME: ((git-commit-name))
+          GIT_COMMIT_NAME: ((git_commit_name))
           GIT_COMMIT_EMAIL: ((git-commit-email))
 
       - task: git-push
@@ -175,7 +175,7 @@ jobs:
           SPEC_FILE: deployments/concourse/conf/spec.yml
           YAML_PROP_PREFIX: uaa
           RELEASE_HUMAN_NAME: UAA BOSH Release
-          GIT_COMMIT_NAME: ((git-commit-name))
+          GIT_COMMIT_NAME: ((git_commit_name))
           GIT_COMMIT_EMAIL: ((git-commit-email))
 
       - task: git-push

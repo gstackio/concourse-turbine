@@ -3,6 +3,7 @@ team_name: gk-plat-ops
 pipeline_name: bump-concourse-turbine
 
 git_uri: git@github.com:gstackio/concourse-turbine.git
+git_commit_name: Gstack Concourse Ninja
 
 docker_ops_image_repo: harbor.ci.gstack.io/gstack/gk-ops
 docker_registry_username: admin
