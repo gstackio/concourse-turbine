@@ -1,0 +1,22 @@
+---
+platform: linux
+
+inputs:
+  - name: bosh-io-release
+  - name: git
+  - name: yasak
+
+outputs:
+  - name: git-bumped
+  - name: bump-info
+
+caches:
+  - path: /usr/local/src/github.com/gstackio/yasak
+
+params:
+  SPEC_FILE:
+  YAML_PROP_PREFIX:
+  RELEASE_HUMAN_NAME: BOSH Release
+
+run:
+  path: git/ci/bump/tasks/bump-bosh-release.sh
