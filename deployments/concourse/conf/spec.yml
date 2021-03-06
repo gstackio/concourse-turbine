@@ -26,6 +26,7 @@ operations_files:
     - cluster/operations/tls
     - cluster/operations/tls-vars
     - cluster/operations/storage-driver
+    - cluster/operations/enable-redacting-credentials
   30_local:
     - pin-stemcell
     - set-log-level
