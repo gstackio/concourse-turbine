@@ -1,5 +1,5 @@
 ---
-team_name: gk-plat-ops
+team_name: gk-plat-devs
 pipeline_name: bump-concourse-turbine
 
 git_uri: git@github.com:gstackio/concourse-turbine.git
