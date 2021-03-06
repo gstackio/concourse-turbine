@@ -16,6 +16,8 @@ params:
   SPEC_FILE:
   YAML_PROP_PREFIX:
   RELEASE_HUMAN_NAME: BOSH Release
+  GIT_COMMIT_NAME:
+  GIT_COMMIT_EMAIL:
 
 run:
   path: git/ci/bump/tasks/bump-bosh-release.sh

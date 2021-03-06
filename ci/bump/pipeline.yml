@@ -103,6 +103,8 @@ jobs:
           SPEC_FILE: deployments/concourse/conf/spec.yml
           YAML_PROP_PREFIX: os_conf
           RELEASE_HUMAN_NAME: OS Conf BOSH Release
+          GIT_COMMIT_NAME: ((git-commit-name))
+          GIT_COMMIT_EMAIL: ((git-commit-email))
 
       - task: git-push
         image: image
@@ -137,6 +139,8 @@ jobs:
           SPEC_FILE: deployments/concourse/conf/spec.yml
           YAML_PROP_PREFIX: credhub
           RELEASE_HUMAN_NAME: Credhub BOSH Release
+          GIT_COMMIT_NAME: ((git-commit-name))
+          GIT_COMMIT_EMAIL: ((git-commit-email))
 
       - task: git-push
         image: image
@@ -171,6 +175,8 @@ jobs:
           SPEC_FILE: deployments/concourse/conf/spec.yml
           YAML_PROP_PREFIX: uaa
           RELEASE_HUMAN_NAME: UAA BOSH Release
+          GIT_COMMIT_NAME: ((git-commit-name))
+          GIT_COMMIT_EMAIL: ((git-commit-email))
 
       - task: git-push
         image: image

@@ -32,8 +32,8 @@ function make_commit() {
     git status
     git diff | cat
 
-    git config --global "user.name" "((git-commit-name))"
-    git config --global "user.email" "((git-commit-email))"
+    git config --global "user.name" "${GIT_COMMIT_NAME}"
+    git config --global "user.email" "${GIT_COMMIT_EMAIL}"
 
     if [[ -z "$(git status --porcelain)" ]]; then
         echo "INFO: nothing to commit. Skipping."
