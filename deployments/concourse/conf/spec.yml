@@ -78,8 +78,8 @@ deployment_vars:
   uaa_version: "75.0.0"
   uaa_sha1: d843716497e5b2610a2e4fe7645f1cd77c86e788
 
-  bbr_sdk_version: "1.18.1"
-  bbr_sdk_sha1: 0eff0c181bc22682c63d8316fe6cc71acbdd1d80
+  bbr_sdk_version: "1.18.3"
+  bbr_sdk_sha1: bdb400afd3392a5faf496bcdcbb7f8ed0b3d707d
 
   # stemcell_os:              # imported below
   # stemcell_version:         # imported below
