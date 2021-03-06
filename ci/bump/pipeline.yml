@@ -188,6 +188,42 @@ jobs:
           GIT_URI: ((git_uri))
           GITHUB_PRIVATE_KEY: ((github-private-key))
 
+  - name: detect-bbr
+    serial: true
+    serial_groups: [ detect ]
+    plan:
+      - in_parallel:
+          - get: bbr-bosh-io-release
+            trigger: true
+            params: { tarball: false }
+          - get: concourse-turbine
+          - get: image
+          - get: yasak
+          - get: gk-automation
+
+      - task: bump-bbr-version
+        image: image
+        file: concourse-turbine/ci/bump/tasks/bump-bosh-release.yml
+        input_mapping:
+          bosh-io-release: bbr-bosh-io-release
+          git: concourse-turbine
+        params:
+          SPEC_FILE: deployments/concourse/conf/spec.yml
+          YAML_PROP_PREFIX: bbr_sdk
+          RELEASE_HUMAN_NAME: BBR BOSH Release
+          GIT_COMMIT_NAME: ((git_commit_name))
+          GIT_COMMIT_EMAIL: ((git-commit-email))
+
+      - task: git-push
+        image: image
+        file: gk-automation/boshrelease/git-push.yml
+        input_mapping:
+          repo: git-bumped
+        params:
+          BRANCH_NAME: master
+          GIT_URI: ((git_uri))
+          GITHUB_PRIVATE_KEY: ((github-private-key))
+
 
 resources:
 
@@ -246,6 +282,11 @@ resources:
     type: bosh-io-release
     source:
       repository: cloudfoundry/uaa-release
+
+  - name: bbr-bosh-io-release
+    type: bosh-io-release
+    source:
+      repository: cloudfoundry-incubator/backup-and-restore-sdk-release
 
   # - name: bump-info
   #   type: keyval
