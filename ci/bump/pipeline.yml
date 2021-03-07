@@ -282,14 +282,6 @@ resources:
       branch: master
       private_key: ((github-private-key))
 
-  - name: yasak
-    type: git
-    icon: github
-    source:
-      uri: git@github.com:gstackio/yasak.git
-      branch: master
-      private_key: ((github-private-key))
-
   - name: concourse-bosh-deployment
     old_name: concourse-deployment-tag
     type: git
@@ -299,26 +291,31 @@ resources:
       branch: master
       tag_filter: ((concourse_version_constraint))
       private_key: ((github-private-key))
+    check_every: 1h
 
   - name: os-conf-bosh-io-release
     type: bosh-io-release
     source:
       repository: cloudfoundry/os-conf-release
+    check_every: 1h
 
   - name: credhub-bosh-io-release
     type: bosh-io-release
     source:
       repository: pivotal-cf/credhub-release
+    check_every: 1h
 
   - name: uaa-bosh-io-release
     type: bosh-io-release
     source:
       repository: cloudfoundry/uaa-release
+    check_every: 1h
 
   - name: bbr-bosh-io-release
     type: bosh-io-release
     source:
       repository: cloudfoundry-incubator/backup-and-restore-sdk-release
+    check_every: 1h
 
   - name: traefik-boshrelease-gh-release
     type: github-release
@@ -329,12 +326,14 @@ resources:
       pre_release: false
       tag_filter: v(\d+\.\d+\.\d+)
       access_token: ((github-access-token))
+    check_every: 1h
 
   - name: warden-stemcell
     type: bosh-io-stemcell
     source:
       name: bosh-warden-boshlite-ubuntu-xenial-go_agent
       version_family: ((stemcell_version_constraint))
+    check_every: 1h
 
 resource_types:
   - name: keyval
