@@ -1,0 +1,27 @@
+---
+platform: linux
+
+image_resource:
+  type: registry-image
+  source: { repository: gstack/gk-ops }
+
+inputs:
+  - name: concourse-turbine # type: git
+  - name: artifact-info     # a 'properties.yml' file with 'version' & 'sha1' values
+  - name: git               # type: git
+
+outputs:
+  - name: git-bumped        # type: git
+  - name: commit-info       # type: keyval
+
+caches:
+  - path: /usr/local/bin/yasak
+  - path: /usr/local/bin/update-yaml-value
+
+params:
+  SPEC_FILE:
+  YAML_PROP_PREFIX:
+  ARTIFACT_HUMAN_NAME: BOSH Release
+
+run:
+  path: concourse-turbine/ci/bump/tasks/bump-deployment-vars.sh

@@ -1,0 +1,19 @@
+---
+platform: linux
+
+image_resource:
+  type: registry-image
+  source: { repository: gstack/gk-ops }
+
+inputs:
+  - name: concourse-turbine # type: git
+  - name: git               # type: git repo, checked out at a specific tag
+
+outputs:
+  - name: git-info # a 'properties.yml' file with a 'tag' value
+
+params:
+  OUTPUT_FILE_NAME: properties.yml
+
+run:
+  path: concourse-turbine/ci/bump/tasks/capture-git-tag.sh

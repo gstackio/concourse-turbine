@@ -1,0 +1,19 @@
+---
+platform: linux
+
+image_resource:
+  type: registry-image
+  source: { repository: gstack/gk-ops }
+
+inputs:
+  - name: concourse-turbine # type: git
+  - name: artifact          # type: bosh-io-release or bosh-io-stemcell
+
+outputs:
+  - name: artifact-info # a 'properties.yml' file with 'version' & 'sha1' values
+
+params:
+  OUTPUT_FILE_NAME: properties.yml
+
+run:
+  path: concourse-turbine/ci/bump/tasks/capture-artifact-version.sh

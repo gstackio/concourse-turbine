@@ -1,0 +1,27 @@
+---
+platform: linux
+
+image_resource:
+  type: registry-image
+  source: { repository: gstack/gk-ops }
+
+inputs:
+  - name: concourse-turbine # type: git
+  - name: git-info          # a 'properties.yml' file with a 'tag' value
+  - name: git               # type: git
+
+outputs:
+  - name: git-bumped        # type: git
+  - name: commit-info       # type: keyval
+
+caches:
+  - path: /usr/local/bin/yasak
+  - path: /usr/local/bin/update-yaml-value
+
+params:
+  SPEC_FILE:
+  INPUT_RESOURCE_NAME:
+  ARTIFACT_HUMAN_NAME:
+
+run:
+  path: concourse-turbine/ci/bump/tasks/bump-input-resource.sh

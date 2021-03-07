@@ -6,77 +6,44 @@ jobs:
     serial_groups: [ detect ]
     plan:
       - in_parallel:
-          - get: concourse-deployment-tag
+          - get: concourse-bosh-deployment
             trigger: true
           - get: concourse-turbine
           - get: image
-          - get: yasak
           - get: gk-automation
+
+      - task: capture-concourse-deployment-tag
+        image: image
+        file: concourse-turbine/ci/bump/tasks/capture-git-tag.yml
+        input_mapping:
+          git: concourse-bosh-deployment
 
       - task: bump-concourse-version
         image: image
+        file: concourse-turbine/ci/bump/tasks/bump-input-resource.yml
         input_mapping:
-          git-tag-repo: concourse-deployment-tag
           git: concourse-turbine
         params:
           SPEC_FILE: deployments/concourse/conf/spec.yml
           INPUT_RESOURCE_NAME: concourse-deployment
-          RELEASE_HUMAN_NAME: Concourse
+          ARTIFACT_HUMAN_NAME: Concourse
+
+      - &git_commit_task
+        task: git-commit
+        image: image
+        file: gk-automation/boshrelease/git-commit.yml
+        input_mapping:
+          repo: git-bumped
+        params:
           GIT_COMMIT_NAME: ((git_commit_name))
           GIT_COMMIT_EMAIL: ((git-commit-email))
-        config:
-          platform: linux
-          inputs:
-            - name: git-tag-repo
-            - name: git
-            - name: yasak
-          outputs:
-            - name: git-bumped
-          caches:
-            - path: /usr/local/src/github.com/gstackio/yasak
-          run:
-            path: bash
-            args:
-              - -c
-              - |
-                set -ueo pipefail -x
 
-                go get github.com/gstackio/yasak
-                sed -i 's|sed -e|sed -i -e|' "yasak/example-edit-value.sh"
-                cp "yasak/example-edit-value.sh" "/usr/local/bin/update-yaml-value"
-
-                latest_tag=$(git -C "git-tag-repo" describe --tags)
-                echo "tag: ${latest_tag}"
-
-                git clone "git" "git-bumped"
-
-                pushd "git-bumped" > /dev/null
-
-                    update-yaml-value \
-                        "${SPEC_FILE}" \
-                        "/input_resources/name=${INPUT_RESOURCE_NAME}/version" \
-                        "${latest_tag}"
-
-                    git config --global "color.ui" "always"
-                    git status
-                    git diff | cat
-
-                    git config --global "user.name" "${GIT_COMMIT_NAME}"
-                    git config --global "user.email" "${GIT_COMMIT_EMAIL}"
-
-                    if [[ -z "$(git status --porcelain)" ]]; then
-                        echo "INFO: nothing to commit. Skipping."
-                    else
-                        git add .
-                        git commit -m "Bump ${RELEASE_HUMAN_NAME} to ${latest_tag}"
-                    fi
-                popd > /dev/null
-
-      - task: git-push
+      - &git_push_task
+        task: git-push
         image: image
         file: gk-automation/boshrelease/git-push.yml
         input_mapping:
-          repo: git-bumped
+          repo: git-committed
         params:
           BRANCH_NAME: master
           GIT_URI: ((git_uri))
@@ -92,31 +59,27 @@ jobs:
             params: { tarball: false }
           - get: concourse-turbine
           - get: image
-          - get: yasak
           - get: gk-automation
+
+      - task: capture-os-conf-version
+        image: image
+        file: concourse-turbine/ci/bump/tasks/capture-artifact-version.yml
+        input_mapping:
+          artifact: os-conf-bosh-io-release
 
       - task: bump-os-conf-version
         image: image
-        file: concourse-turbine/ci/bump/tasks/bump-bosh-release.yml
+        file: concourse-turbine/ci/bump/tasks/bump-deployment-vars.yml
         input_mapping:
-          bosh-io-release: os-conf-bosh-io-release
           git: concourse-turbine
         params:
           SPEC_FILE: deployments/concourse/conf/spec.yml
           YAML_PROP_PREFIX: os_conf
-          RELEASE_HUMAN_NAME: OS Conf BOSH Release
-          GIT_COMMIT_NAME: ((git_commit_name))
-          GIT_COMMIT_EMAIL: ((git-commit-email))
+          ARTIFACT_HUMAN_NAME: OS-Conf BOSH Release
 
-      - task: git-push
-        image: image
-        file: gk-automation/boshrelease/git-push.yml
-        input_mapping:
-          repo: git-bumped
-        params:
-          BRANCH_NAME: master
-          GIT_URI: ((git_uri))
-          GITHUB_PRIVATE_KEY: ((github-private-key))
+      - *git_commit_task
+
+      - *git_push_task
 
   - name: detect-credhub
     serial: true
@@ -128,31 +91,27 @@ jobs:
             params: { tarball: false }
           - get: concourse-turbine
           - get: image
-          - get: yasak
           - get: gk-automation
+
+      - task: capture-credhub-version
+        image: image
+        file: concourse-turbine/ci/bump/tasks/capture-artifact-version.yml
+        input_mapping:
+          artifact: credhub-bosh-io-release
 
       - task: bump-credhub-version
         image: image
-        file: concourse-turbine/ci/bump/tasks/bump-bosh-release.yml
+        file: concourse-turbine/ci/bump/tasks/bump-deployment-vars.yml
         input_mapping:
-          bosh-io-release: credhub-bosh-io-release
           git: concourse-turbine
         params:
           SPEC_FILE: deployments/concourse/conf/spec.yml
           YAML_PROP_PREFIX: credhub
-          RELEASE_HUMAN_NAME: Credhub BOSH Release
-          GIT_COMMIT_NAME: ((git_commit_name))
-          GIT_COMMIT_EMAIL: ((git-commit-email))
+          ARTIFACT_HUMAN_NAME: Credhub BOSH Release
 
-      - task: git-push
-        image: image
-        file: gk-automation/boshrelease/git-push.yml
-        input_mapping:
-          repo: git-bumped
-        params:
-          BRANCH_NAME: master
-          GIT_URI: ((git_uri))
-          GITHUB_PRIVATE_KEY: ((github-private-key))
+      - *git_commit_task
+
+      - *git_push_task
 
   - name: detect-uaa
     serial: true
@@ -164,31 +123,27 @@ jobs:
             params: { tarball: false }
           - get: concourse-turbine
           - get: image
-          - get: yasak
           - get: gk-automation
+
+      - task: capture-uaa-version
+        image: image
+        file: concourse-turbine/ci/bump/tasks/capture-artifact-version.yml
+        input_mapping:
+          artifact: uaa-bosh-io-release
 
       - task: bump-uaa-version
         image: image
-        file: concourse-turbine/ci/bump/tasks/bump-bosh-release.yml
+        file: concourse-turbine/ci/bump/tasks/bump-deployment-vars.yml
         input_mapping:
-          bosh-io-release: uaa-bosh-io-release
           git: concourse-turbine
         params:
           SPEC_FILE: deployments/concourse/conf/spec.yml
           YAML_PROP_PREFIX: uaa
-          RELEASE_HUMAN_NAME: UAA BOSH Release
-          GIT_COMMIT_NAME: ((git_commit_name))
-          GIT_COMMIT_EMAIL: ((git-commit-email))
+          ARTIFACT_HUMAN_NAME: UAA BOSH Release
 
-      - task: git-push
-        image: image
-        file: gk-automation/boshrelease/git-push.yml
-        input_mapping:
-          repo: git-bumped
-        params:
-          BRANCH_NAME: master
-          GIT_URI: ((git_uri))
-          GITHUB_PRIVATE_KEY: ((github-private-key))
+      - *git_commit_task
+
+      - *git_push_task
 
   - name: detect-bbr
     serial: true
@@ -200,31 +155,27 @@ jobs:
             params: { tarball: false }
           - get: concourse-turbine
           - get: image
-          - get: yasak
           - get: gk-automation
+
+      - task: capture-bbr-version
+        image: image
+        file: concourse-turbine/ci/bump/tasks/capture-artifact-version.yml
+        input_mapping:
+          artifact: bbr-bosh-io-release
 
       - task: bump-bbr-version
         image: image
-        file: concourse-turbine/ci/bump/tasks/bump-bosh-release.yml
+        file: concourse-turbine/ci/bump/tasks/bump-deployment-vars.yml
         input_mapping:
-          bosh-io-release: bbr-bosh-io-release
           git: concourse-turbine
         params:
           SPEC_FILE: deployments/concourse/conf/spec.yml
           YAML_PROP_PREFIX: bbr_sdk
-          RELEASE_HUMAN_NAME: BBR BOSH Release
-          GIT_COMMIT_NAME: ((git_commit_name))
-          GIT_COMMIT_EMAIL: ((git-commit-email))
+          ARTIFACT_HUMAN_NAME: BBR BOSH Release
 
-      - task: git-push
-        image: image
-        file: gk-automation/boshrelease/git-push.yml
-        input_mapping:
-          repo: git-bumped
-        params:
-          BRANCH_NAME: master
-          GIT_URI: ((git_uri))
-          GITHUB_PRIVATE_KEY: ((github-private-key))
+      - *git_commit_task
+
+      - *git_push_task
 
   - name: detect-traefik
     serial: true
@@ -236,89 +187,41 @@ jobs:
             params: { globs: [ traefik-*.tgz ] }
           - get: concourse-turbine
           - get: image
-          - get: yasak
           - get: gk-automation
 
-      - task: bump-traefik-version
+      - task: capture-traefik-release-info
         image: image
+        file: concourse-turbine/ci/bump/tasks/capture-bosh-release-gh-release-info.yml
         input_mapping:
           github-release: traefik-boshrelease-gh-release
+        params:
+          BOSH_RELEASE_TABALL: traefik-*.tgz
+
+      - task: bump-traefik-deployment-version
+        image: image
+        file: concourse-turbine/ci/bump/tasks/bump-input-resource.yml
+        input_mapping:
           git: concourse-turbine
+          git-info: release-info
         params:
           SPEC_FILE: deployments/traefik/conf/spec.yml
           INPUT_RESOURCE_NAME: traefik-boshrelease
-          SPEC_FILE2: deployments/concourse/conf/spec.yml
-          YAML_PROP_PREFIX: traefik
-          RELEASE_HUMAN_NAME: Traefik BOSH Release
-          GIT_COMMIT_NAME: ((git_commit_name))
-          GIT_COMMIT_EMAIL: ((git-commit-email))
-        config:
-          platform: linux
-          inputs:
-            - name: github-release
-            - name: git
-            - name: yasak
-          outputs:
-            - name: git-bumped
-          caches:
-            - path: /usr/local/src/github.com/gstackio/yasak
-          run:
-            path: bash
-            args:
-              - -c
-              - |
-                set -ueo pipefail -x
+          ARTIFACT_HUMAN_NAME: Traefik BOSH Release
 
-                go get github.com/gstackio/yasak
-                sed -i 's|sed -e|sed -i -e|' "yasak/example-edit-value.sh"
-                cp "yasak/example-edit-value.sh" "/usr/local/bin/update-yaml-value"
-
-                tag=$(< github-release/tag)
-                version=$(< github-release/version)
-                sha1=$(shasum -a 1 github-release/traefik-*.tgz | cut -d" " -f1)
-
-                git clone "git" "git-bumped"
-
-                pushd "git-bumped" > /dev/null
-                    update-yaml-value \
-                        "${SPEC_FILE}" \
-                        "/input_resources/name=${INPUT_RESOURCE_NAME}/version" \
-                        "${tag}"
-
-                    update-yaml-value \
-                        "${SPEC_FILE2}" \
-                        "/deployment_vars/${YAML_PROP_PREFIX}_version" \
-                        "\"${version}\""
-
-                    update-yaml-value \
-                        "${SPEC_FILE2}" \
-                        "/deployment_vars/${YAML_PROP_PREFIX}_sha1" \
-                        "${sha1}"
-
-                    git config --global "color.ui" "always"
-                    git status
-                    git diff | cat
-
-                    git config --global "user.name" "${GIT_COMMIT_NAME}"
-                    git config --global "user.email" "${GIT_COMMIT_EMAIL}"
-
-                    if [[ -z "$(git status --porcelain)" ]]; then
-                        echo "INFO: nothing to commit. Skipping."
-                    else
-                        git add .
-                        git commit -m "Bump ${RELEASE_HUMAN_NAME} to version ${version}"
-                    fi
-                popd > /dev/null
-
-      - task: git-push
+      - task: bump-traefik-boshrelease-version
         image: image
-        file: gk-automation/boshrelease/git-push.yml
+        file: concourse-turbine/ci/bump/tasks/bump-deployment-vars.yml
         input_mapping:
-          repo: git-bumped
+          git: git-bumped
+          artifact-info: release-info
         params:
-          BRANCH_NAME: master
-          GIT_URI: ((git_uri))
-          GITHUB_PRIVATE_KEY: ((github-private-key))
+          SPEC_FILE: deployments/concourse/conf/spec.yml
+          YAML_PROP_PREFIX: traefik
+          ARTIFACT_HUMAN_NAME: Traefik BOSH Release
+
+      - *git_commit_task
+
+      - *git_push_task
 
   - name: detect-warden-stemcell
     serial: true
@@ -330,31 +233,27 @@ jobs:
             params: { tarball: false }
           - get: concourse-turbine
           - get: image
-          - get: yasak
           - get: gk-automation
+
+      - task: capture-warden-stemcell-version
+        image: image
+        file: concourse-turbine/ci/bump/tasks/capture-artifact-version.yml
+        input_mapping:
+          artifact: warden-stemcell
 
       - task: bump-warden-stemcell-version
         image: image
-        file: concourse-turbine/ci/bump/tasks/bump-bosh-release.yml
+        file: concourse-turbine/ci/bump/tasks/bump-deployment-vars.yml
         input_mapping:
-          bosh-io-release: warden-stemcell
           git: concourse-turbine
         params:
           SPEC_FILE: deployments/traefik/conf/spec.yml
           YAML_PROP_PREFIX: stemcell
-          RELEASE_HUMAN_NAME: Warden BOSH-Lite Stemcell
-          GIT_COMMIT_NAME: ((git_commit_name))
-          GIT_COMMIT_EMAIL: ((git-commit-email))
+          ARTIFACT_HUMAN_NAME: Warden BOSH-Lite Stemcell
 
-      - task: git-push
-        image: image
-        file: gk-automation/boshrelease/git-push.yml
-        input_mapping:
-          repo: git-bumped
-        params:
-          BRANCH_NAME: master
-          GIT_URI: ((git_uri))
-          GITHUB_PRIVATE_KEY: ((github-private-key))
+      - *git_commit_task
+
+      - *git_push_task
 
 
 resources:
@@ -391,7 +290,8 @@ resources:
       branch: master
       private_key: ((github-private-key))
 
-  - name: concourse-deployment-tag
+  - name: concourse-bosh-deployment
+    old_name: concourse-deployment-tag
     type: git
     icon: github
     source:
