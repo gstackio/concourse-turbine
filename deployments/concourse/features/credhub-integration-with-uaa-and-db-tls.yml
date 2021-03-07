@@ -342,12 +342,9 @@
   type: replace
   value:
     name: traefik
-    version: 1.15.0
-    url: https://s3.eu-west-3.amazonaws.com/traefik-boshrelease/compiled-releases/traefik/traefik-1.15.0-ubuntu-xenial-621.95-20201223-155156-221627372-20201223155157.tgz
-    sha1: f074c19b4d235ef927f78dc07f93ac9b50f44fe0
-    stemcell:
-      os: ubuntu-xenial
-      version: "621.95"
+    version: ((traefik_version))
+    url: https://github.com/gstackio/traefik-boshrelease/releases/download/v((traefik_version))/traefik-((traefik_version)).tgz
+    sha1: ((traefik_sha1))
 
 - path: /instance_groups/name=uaa/jobs/name=traefik?
   type: replace

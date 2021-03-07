@@ -15,15 +15,23 @@ jobs:
 
       - task: bump-concourse-version
         image: image
+        input_mapping:
+          git-tag-repo: concourse-deployment-tag
+          git: concourse-turbine
+        params:
+          SPEC_FILE: deployments/concourse/conf/spec.yml
+          INPUT_RESOURCE_NAME: concourse-deployment
+          RELEASE_HUMAN_NAME: Concourse
+          GIT_COMMIT_NAME: ((git_commit_name))
+          GIT_COMMIT_EMAIL: ((git-commit-email))
         config:
           platform: linux
           inputs:
-            - name: concourse-deployment-tag
-            - name: concourse-turbine
+            - name: git-tag-repo
+            - name: git
             - name: yasak
           outputs:
-            - name: concourse-turbine-bumped
-            - name: bump-info
+            - name: git-bumped
           caches:
             - path: /usr/local/src/github.com/gstackio/yasak
           run:
@@ -33,40 +41,34 @@ jobs:
               - |
                 set -ueo pipefail -x
 
-                # pushd "concourse-turbine-bumped" > /dev/null
-                #     go get
-                #     make
-                #     cp "yasak" "/usr/local/bin"
-                # popd > /dev/null
-
                 go get github.com/gstackio/yasak
                 sed -i 's|sed -e|sed -i -e|' "yasak/example-edit-value.sh"
                 cp "yasak/example-edit-value.sh" "/usr/local/bin/update-yaml-value"
 
-                latest_concourse_tag=$(git -C "concourse-deployment-tag" describe --tags)
-                echo "tag: ${latest_concourse_tag}"
+                latest_tag=$(git -C "git-tag-repo" describe --tags)
+                echo "tag: ${latest_tag}"
 
-                git clone "concourse-turbine" "concourse-turbine-bumped"
+                git clone "git" "git-bumped"
 
-                pushd "concourse-turbine-bumped" > /dev/null
+                pushd "git-bumped" > /dev/null
 
                     update-yaml-value \
-                        "deployments/concourse/conf/spec.yml" \
-                        "/input_resources/name=concourse-deployment/version" \
-                        "${latest_concourse_tag}"
+                        "${SPEC_FILE}" \
+                        "/input_resources/name=${INPUT_RESOURCE_NAME}/version" \
+                        "${latest_tag}"
 
                     git config --global "color.ui" "always"
                     git status
                     git diff | cat
 
-                    git config --global "user.name" "((git_commit_name))"
-                    git config --global "user.email" "((git-commit-email))"
+                    git config --global "user.name" "${GIT_COMMIT_NAME}"
+                    git config --global "user.email" "${GIT_COMMIT_EMAIL}"
 
                     if [[ -z "$(git status --porcelain)" ]]; then
                         echo "INFO: nothing to commit. Skipping."
                     else
                         git add .
-                        git commit -m "Bump Concourse to ${latest_concourse_tag}"
+                        git commit -m "Bump ${RELEASE_HUMAN_NAME} to ${latest_tag}"
                     fi
                 popd > /dev/null
 
@@ -74,7 +76,7 @@ jobs:
         image: image
         file: gk-automation/boshrelease/git-push.yml
         input_mapping:
-          repo: concourse-turbine-bumped
+          repo: git-bumped
         params:
           BRANCH_NAME: master
           GIT_URI: ((git_uri))
@@ -224,6 +226,136 @@ jobs:
           GIT_URI: ((git_uri))
           GITHUB_PRIVATE_KEY: ((github-private-key))
 
+  - name: detect-traefik
+    serial: true
+    serial_groups: [ detect ]
+    plan:
+      - in_parallel:
+          - get: traefik-boshrelease-gh-release
+            trigger: true
+            params: { globs: [ traefik-*.tgz ] }
+          - get: concourse-turbine
+          - get: image
+          - get: yasak
+          - get: gk-automation
+
+      - task: bump-traefik-version
+        image: image
+        input_mapping:
+          github-release: traefik-boshrelease-gh-release
+          git: concourse-turbine
+        params:
+          SPEC_FILE: deployments/traefik/conf/spec.yml
+          INPUT_RESOURCE_NAME: traefik-boshrelease
+          SPEC_FILE2: deployments/concourse/conf/spec.yml
+          YAML_PROP_PREFIX: traefik
+          RELEASE_HUMAN_NAME: Traefik BOSH Release
+          GIT_COMMIT_NAME: ((git_commit_name))
+          GIT_COMMIT_EMAIL: ((git-commit-email))
+        config:
+          platform: linux
+          inputs:
+            - name: github-release
+            - name: git
+            - name: yasak
+          outputs:
+            - name: git-bumped
+          caches:
+            - path: /usr/local/src/github.com/gstackio/yasak
+          run:
+            path: bash
+            args:
+              - -c
+              - |
+                set -ueo pipefail -x
+
+                go get github.com/gstackio/yasak
+                sed -i 's|sed -e|sed -i -e|' "yasak/example-edit-value.sh"
+                cp "yasak/example-edit-value.sh" "/usr/local/bin/update-yaml-value"
+
+                tag=$(< github-release/tag)
+                version=$(< github-release/version)
+                sha1=$(shasum -a 1 github-release/traefik-*.tgz | cut -d" " -f1)
+
+                git clone "git" "git-bumped"
+
+                pushd "git-bumped" > /dev/null
+                    update-yaml-value \
+                        "${SPEC_FILE}" \
+                        "/input_resources/name=${INPUT_RESOURCE_NAME}/version" \
+                        "${tag}"
+
+                    update-yaml-value \
+                        "${SPEC_FILE2}" \
+                        "/deployment_vars/${YAML_PROP_PREFIX}_version" \
+                        "\"${version}\""
+
+                    update-yaml-value \
+                        "${SPEC_FILE2}" \
+                        "/deployment_vars/${YAML_PROP_PREFIX}_sha1" \
+                        "${sha1}"
+
+                    git config --global "color.ui" "always"
+                    git status
+                    git diff | cat
+
+                    git config --global "user.name" "${GIT_COMMIT_NAME}"
+                    git config --global "user.email" "${GIT_COMMIT_EMAIL}"
+
+                    if [[ -z "$(git status --porcelain)" ]]; then
+                        echo "INFO: nothing to commit. Skipping."
+                    else
+                        git add .
+                        git commit -m "Bump ${RELEASE_HUMAN_NAME} to version ${version}"
+                    fi
+                popd > /dev/null
+
+      - task: git-push
+        image: image
+        file: gk-automation/boshrelease/git-push.yml
+        input_mapping:
+          repo: git-bumped
+        params:
+          BRANCH_NAME: master
+          GIT_URI: ((git_uri))
+          GITHUB_PRIVATE_KEY: ((github-private-key))
+
+  - name: detect-warden-stemcell
+    serial: true
+    serial_groups: [ detect ]
+    plan:
+      - in_parallel:
+          - get: warden-stemcell
+            trigger: true
+            params: { tarball: false }
+          - get: concourse-turbine
+          - get: image
+          - get: yasak
+          - get: gk-automation
+
+      - task: bump-warden-stemcell-version
+        image: image
+        file: concourse-turbine/ci/bump/tasks/bump-bosh-release.yml
+        input_mapping:
+          bosh-io-release: warden-stemcell
+          git: concourse-turbine
+        params:
+          SPEC_FILE: deployments/traefik/conf/spec.yml
+          YAML_PROP_PREFIX: stemcell
+          RELEASE_HUMAN_NAME: Warden BOSH-Lite Stemcell
+          GIT_COMMIT_NAME: ((git_commit_name))
+          GIT_COMMIT_EMAIL: ((git-commit-email))
+
+      - task: git-push
+        image: image
+        file: gk-automation/boshrelease/git-push.yml
+        input_mapping:
+          repo: git-bumped
+        params:
+          BRANCH_NAME: master
+          GIT_URI: ((git_uri))
+          GITHUB_PRIVATE_KEY: ((github-private-key))
+
 
 resources:
 
@@ -288,8 +420,21 @@ resources:
     source:
       repository: cloudfoundry-incubator/backup-and-restore-sdk-release
 
-  # - name: bump-info
-  #   type: keyval
+  - name: traefik-boshrelease-gh-release
+    type: github-release
+    icon: github
+    source:
+      owner: gstackio
+      repository: traefik-boshrelease
+      pre_release: false
+      tag_filter: v(\d+\.\d+\.\d+)
+      access_token: ((github-access-token))
+
+  - name: warden-stemcell
+    type: bosh-io-stemcell
+    source:
+      name: bosh-warden-boshlite-ubuntu-xenial-go_agent
+      version_family: ((stemcell_version_constraint))
 
 resource_types:
   - name: keyval
