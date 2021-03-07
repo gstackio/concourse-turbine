@@ -88,11 +88,6 @@ deployment_vars:
   # stemcell_version:         # imported below
   # stemcell_sha1:            # imported below
 
-  # stemcell_name: bosh-azure-hyperv-ubuntu-xenial-go_agent
-  # stemcell_os: ubuntu-xenial
-  # stemcell_version: "621.92"
-  # stemcell_sha1: 7f231f0ca5b521e0d13bc1e97c194c68baff3242
-
 
   # Scaling properties
 
