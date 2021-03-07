@@ -8,7 +8,7 @@ input_resources:
   - name: traefik-boshrelease
     type: git
     uri: https://github.com/gstackio/traefik-boshrelease.git
-    version: "ceac167" # v1.15.0 (Traefik v1.7.26) with compiled release for stemcell v621.95
+    version: v1.15.0 # v1.15.0 (Traefik v1.7.26) with compiled release for stemcell v621.95
 
 
 main_deployment_file: traefik-boshrelease/deployment/traefik.yml

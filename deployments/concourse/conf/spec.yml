@@ -79,7 +79,7 @@ deployment_vars:
   uaa_sha1: d843716497e5b2610a2e4fe7645f1cd77c86e788
 
   traefik_version: "1.15.0"
-  traefik_sha1: d843716497e5b2610a2e4fe7645f1cd77c86e788
+  traefik_sha1: d504c6a5e52056e3d87117d7031c06e21658109e
 
   bbr_sdk_version: "1.18.3"
   bbr_sdk_sha1: bdb400afd3392a5faf496bcdcbb7f8ed0b3d707d
