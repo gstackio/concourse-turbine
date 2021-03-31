@@ -2,10 +2,6 @@
 
 set -ueo pipefail -x
 
-source "git/ci/bump/tasks/functions.inc.bash"
-
-install_yasak
-
 version=$(bosh interpolate --path "/version" "artifact-info/properties.yml")
 sha1=$(   bosh interpolate --path "/sha1"    "artifact-info/properties.yml")
 

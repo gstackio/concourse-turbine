@@ -2,10 +2,6 @@
 
 set -ueo pipefail -x
 
-source "git/ci/bump/tasks/functions.inc.bash"
-
-install_yasak
-
 git_tag=$(bosh interpolate --path "/tag" "git-info/properties.yml")
 
 git clone "git" "git-bumped"
