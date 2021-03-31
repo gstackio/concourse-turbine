@@ -290,6 +290,7 @@ resources:
       uri: git@github.com:concourse/concourse-bosh-deployment.git
       branch: master
       tag_filter: ((concourse_version_constraint))
+      # tag_regex:  ((concourse_version_constraint))
       private_key: ((github-private-key))
     check_every: 1h
 

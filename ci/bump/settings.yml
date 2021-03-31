@@ -9,4 +9,4 @@ docker_ops_image_repo: harbor.ci.gstack.io/gstack/gk-ops
 docker_registry_username: admin
 
 stemcell_version_constraint: "621.latest"
-concourse_version_constraint: v6.7.3 # v(6\.7\.\d+)
+concourse_version_constraint: v6.7.* # tag_filter: v6.7.* tag_regex: v(6\.7\.\d+)
