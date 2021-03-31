@@ -43,7 +43,7 @@ jobs:
         image: image
         file: gk-automation/boshrelease/git-push.yml
         input_mapping:
-          repo: git-committed
+          repo: repo-committed
         params:
           BRANCH_NAME: master
           GIT_URI: ((git_uri))
