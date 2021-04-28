@@ -264,8 +264,7 @@ jobs:
             resource: vsphere-stemcell
             trigger: true
             params: { tarball: false }
-          - get: git
-            resource: concourse-turbine
+          - get: concourse-turbine
           - get: image
           - get: gk-automation
 
@@ -275,7 +274,9 @@ jobs:
 
       - task: bump-vsphere-stemcell-version
         image: image
-        file: git/ci/bump/tasks/bump-deployment-vars.yml
+        file: concourse-turbine/ci/bump/tasks/bump-deployment-vars.yml
+        input_mapping:
+          git: concourse-turbine
         params:
           SPEC_FILE: ddbox-garden-env/conf/spec.yml
           YAML_PROP_PREFIX: stemcell
