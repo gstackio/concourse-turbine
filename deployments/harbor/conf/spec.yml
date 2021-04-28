@@ -53,7 +53,7 @@ deployment_vars:
 
   harbor_vm_type: default
   ephemeral_disk_vm_extension: 10GB_ephemeral_disk
-  persistent_disk_type: 20GB
+  persistent_disk_type: 50GB
 
 
   # Versions
