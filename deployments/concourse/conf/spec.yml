@@ -38,6 +38,8 @@ operations_files:
     - routing
     - pin-bbr-version
     - secure-internal-postgres-bbr-ca
+    - backup-credhub
+    - backup-uaa
     - trust-traefik-ca
     - static-web
     - static-credhub

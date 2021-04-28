@@ -1,0 +1,15 @@
+---
+
+- path: /instance_groups/name=uaa/jobs/name=bbr-uaadb
+  type: replace
+  value:
+    name: bbr-uaadb
+    release: uaa
+    properties:
+      release_level_backup: true
+
+- path: /instance_groups/name=uaa/jobs/name=database-backup-restorer
+  type: replace
+  value:
+    name: database-backup-restorer
+    release: backup-and-restore-sdk
