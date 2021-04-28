@@ -14,10 +14,6 @@ outputs:
   - name: git-bumped        # type: git
   - name: commit-info       # type: keyval
 
-caches:
-  - path: /usr/local/bin/yasak
-  - path: /usr/local/bin/update-yaml-value
-
 params:
   SPEC_FILE:
   YAML_PROP_PREFIX:
