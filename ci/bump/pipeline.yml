@@ -255,6 +255,36 @@ jobs:
 
       - *git_push_task
 
+  - name: detect-vsphere-stemcell
+    serial: true
+    serial_groups: [ detect ]
+    plan:
+      - in_parallel:
+          - get: artifact
+            resource: vsphere-stemcell
+            trigger: true
+            params: { tarball: false }
+          - get: git
+            resource: concourse-turbine
+          - get: image
+          - get: gk-automation
+
+      - task: capture-vsphere-stemcell-version
+        image: image
+        file: concourse-turbine/ci/bump/tasks/capture-artifact-version.yml
+
+      - task: bump-vsphere-stemcell-version
+        image: image
+        file: git/ci/bump/tasks/bump-deployment-vars.yml
+        params:
+          SPEC_FILE: ddbox-garden-env/conf/spec.yml
+          YAML_PROP_PREFIX: stemcell
+          ARTIFACT_HUMAN_NAME: vSphere ESXi Stemcell
+
+      - *git_commit_task
+
+      - *git_push_task
+
 
 resources:
 
@@ -336,6 +366,13 @@ resources:
     type: bosh-io-stemcell
     source:
       name: bosh-warden-boshlite-ubuntu-xenial-go_agent
+      version_family: ((stemcell_version_constraint))
+    check_every: 24h
+
+  - name: vsphere-stemcell
+    type: bosh-io-stemcell
+    source:
+      name: bosh-vsphere-esxi-ubuntu-xenial-go_agent
       version_family: ((stemcell_version_constraint))
     check_every: 24h
 
