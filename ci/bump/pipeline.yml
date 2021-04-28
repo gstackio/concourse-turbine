@@ -265,6 +265,7 @@ resources:
       repository: ((docker_ops_image_repo))
       username: ((docker_registry_username))
       password: ((docker-registry-password))
+    check_every: 24h
 
   - name: gk-automation
     type: git
@@ -273,6 +274,7 @@ resources:
       uri: git@github.com:gstackio/gk-automation.git
       branch: master
       private_key: ((github-private-key))
+    check_every: 24h
 
   - name: concourse-turbine
     type: git
@@ -281,6 +283,7 @@ resources:
       uri: ((git_uri))
       branch: master
       private_key: ((github-private-key))
+    check_every: 24h
 
   - name: concourse-bosh-deployment
     old_name: concourse-deployment-tag
@@ -292,31 +295,31 @@ resources:
       tag_filter: ((concourse_version_constraint))
       # tag_regex:  ((concourse_version_constraint))
       private_key: ((github-private-key))
-    check_every: 1h
+    check_every: 24h
 
   - name: os-conf-bosh-io-release
     type: bosh-io-release
     source:
       repository: cloudfoundry/os-conf-release
-    check_every: 1h
+    check_every: 24h
 
   - name: credhub-bosh-io-release
     type: bosh-io-release
     source:
       repository: pivotal-cf/credhub-release
-    check_every: 1h
+    check_every: 24h
 
   - name: uaa-bosh-io-release
     type: bosh-io-release
     source:
       repository: cloudfoundry/uaa-release
-    check_every: 1h
+    check_every: 24h
 
   - name: bbr-bosh-io-release
     type: bosh-io-release
     source:
       repository: cloudfoundry-incubator/backup-and-restore-sdk-release
-    check_every: 1h
+    check_every: 24h
 
   - name: traefik-boshrelease-gh-release
     type: github-release
@@ -334,7 +337,7 @@ resources:
     source:
       name: bosh-warden-boshlite-ubuntu-xenial-go_agent
       version_family: ((stemcell_version_constraint))
-    check_every: 1h
+    check_every: 24h
 
 resource_types:
   - name: keyval
