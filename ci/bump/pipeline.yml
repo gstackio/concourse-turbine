@@ -303,7 +303,7 @@ resources:
     icon: github
     source:
       uri: git@github.com:gstackio/gk-automation.git
-      branch: master
+      branch: v1
       private_key: ((github-private-key))
     check_every: 24h
 
