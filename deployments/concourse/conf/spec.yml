@@ -7,7 +7,7 @@ input_resources:
   - name: concourse-deployment
     type: git
     uri: https://github.com/concourse/concourse-bosh-deployment.git
-    version: v6.7.3
+    version: v6.7.4
 
 
 sanity-tests:
