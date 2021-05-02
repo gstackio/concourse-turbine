@@ -1,1 +1,9 @@
-../../src/gstack-bosh-environment/ddbox-standalone-garden-env/features/custom-bosh-version-precompiled.yml
+---
+
+- path: /releases/name=bosh?
+  type: replace
+  value:
+    name: bosh
+    version: ((bosh_precompiled_version))
+    url: ((bosh_precompiled_url))
+    sha1: ((bosh_precompiled_sha1))
