@@ -87,7 +87,7 @@ deployment_vars:
 
 
 imported_vars:
-  - subsys: concourse-garden-env
+  - subsys: ddbox-garden-env
     imports:
 
       - name: stemcell_name

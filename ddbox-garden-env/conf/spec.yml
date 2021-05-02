@@ -75,7 +75,7 @@ deployment_vars:
 
 
 imported_vars:
-  - subsys: concourse-bosh-env
+  - subsys: ddbox-bosh-env
     imports:
 
       - name: blobstore_ip
