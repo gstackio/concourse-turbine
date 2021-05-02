@@ -1,8 +1,8 @@
 ---
 subsys:
-  name: concourse-bosh-env
+  name: ddbox-bosh-env
   type: bosh-environment
-  depends_on: [ concourse-garden-env ]
+  depends_on: [ ddboox-garden-env ]
 
 input_resources:
   - name: bosh-deployment

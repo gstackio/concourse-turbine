@@ -1,6 +1,6 @@
 ---
 subsys:
-  name: concourse-garden-env
+  name: ddbox-garden-env
   type: bosh-environment
 
 input_resources:
