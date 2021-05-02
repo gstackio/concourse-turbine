@@ -31,23 +31,18 @@ jobs:
       - &git_commit_task
         task: git-commit
         image: image
-        file: gk-automation/boshrelease/git-commit.yml
+        file: gk-automation/tasks/git/commit.yml
         input_mapping:
           repo: git-bumped
         params:
-          GIT_COMMIT_NAME: ((git_commit_name))
+          GIT_COMMIT_NAME:  ((git_commit_name))
           GIT_COMMIT_EMAIL: ((git-commit-email))
 
       - &git_push_task
-        task: git-push
-        image: image
-        file: gk-automation/boshrelease/git-push.yml
-        input_mapping:
-          repo: repo-committed
+        put: concourse-turbine
         params:
-          BRANCH_NAME: master
-          GIT_URI: ((git_uri))
-          GITHUB_PRIVATE_KEY: ((github-private-key))
+          repository: repo-committed
+          rebase:     true
 
   - name: detect-os-conf
     serial: true
@@ -303,7 +298,7 @@ resources:
     icon: github
     source:
       uri: git@github.com:gstackio/gk-automation.git
-      branch: v1
+      branch: master
       private_key: ((github-private-key))
     check_every: 24h
 

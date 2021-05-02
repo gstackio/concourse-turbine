@@ -21,6 +21,4 @@ pushd "git-bumped" > /dev/null
 
 popd > /dev/null
 
-# Write properties to the keyval output resource
-echo "commit_message=Bump ${ARTIFACT_HUMAN_NAME} to version ${version}" \
-    >> commit-info/keyval.properties
+echo "Bump ${ARTIFACT_HUMAN_NAME} to version ${version}" > commit-info/commit-message
