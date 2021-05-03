@@ -66,8 +66,8 @@ deployment_vars:
   # Versions
 
   bosh_precompiled_version: "271.8.0"
-  bosh_precompiled_url: https://s3.amazonaws.com/bosh-compiled-release-tarballs/bosh-271.8.0-ubuntu-xenial-621.123-20210419-225108-648707522-20210419225110.tgz
-  bosh_precompiled_sha1: 74cf2470b56efa5fef5c9ecdbf6c5508ab55d056
+  bosh_precompiled_url: https://s3.amazonaws.com/bosh-compiled-release-tarballs/bosh-271.8.0-ubuntu-xenial-621.125-20210430-221230-174525687-20210430221231.tgz
+  bosh_precompiled_sha1: bbd68666652887fd52fe1fbd2b41228a7da26f7c
 
   stemcell_name: bosh-vsphere-esxi-ubuntu-bionic-go_agent
   stemcell_version: "0.28"
