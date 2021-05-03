@@ -1,0 +1,27 @@
+---
+
+# NOTICE: with the 'go-patch' library, '~1' is the escapiing sequence for '/'.
+
+- path: /variables/name=~1dns_healthcheck_tls_ca/update_mode?
+  type: replace
+  value: converge
+
+- path: /variables/name=~1dns_healthcheck_server_tls/update_mode?
+  type: replace
+  value: converge
+
+- path: /variables/name=~1dns_healthcheck_client_tls/update_mode?
+  type: replace
+  value: converge
+
+- path: /variables/name=~1dns_api_tls_ca/update_mode?
+  type: replace
+  value: converge
+
+- path: /variables/name=~1dns_api_server_tls/update_mode?
+  type: replace
+  value: converge
+
+- path: /variables/name=~1dns_api_client_tls/update_mode?
+  type: replace
+  value: converge

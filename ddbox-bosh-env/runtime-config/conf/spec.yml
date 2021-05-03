@@ -7,12 +7,14 @@ input_resources:
   - name: bosh-deployment
     type: git
     uri: https://github.com/cloudfoundry/bosh-deployment.git
-    version: "a6f337d" # BOSH v271.2.0 (as of Sep 24th, 2020)
+    version: "7ec22bc" # BOSH v271.8.0 (as of Apr 20th, 2021)
 
 
 main_config_file: bosh-deployment/runtime-configs/dns.yml
 
-operations_files: {}
+operations_files:
+  10_local:
+    - update-mode-converge
 
 
 config_vars: {}
