@@ -371,11 +371,3 @@ resources:
       name: bosh-vsphere-esxi-ubuntu-xenial-go_agent
       version_family: ((stemcell_version_constraint))
     check_every: 24h
-
-resource_types:
-  - name: keyval
-    type: docker-image
-    source:
-      repository: harbor.ci.gstack.io/swce/keyval-resource
-      username: ((docker_registry_username))
-      password: ((docker-registry-password))
