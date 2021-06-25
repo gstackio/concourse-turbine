@@ -4,6 +4,6 @@
   type: replace
   value:
     name: bosh
-    version: ((bosh_precompiled_version))
-    url: ((bosh_precompiled_url))
-    sha1: ((bosh_precompiled_sha1))
+    version: ((bosh_version))
+    url: ((bosh_url))
+    sha1: ((bosh_sha1))

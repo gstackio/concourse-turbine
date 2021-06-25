@@ -77,9 +77,9 @@ deployment_vars:
 
   # Versions
 
-  # bosh_precompiled_version: # imported below
-  # bosh_precompiled_url:     # imported below
-  # bosh_precompiled_sha1:    # imported below
+  # bosh_version: # imported below
+  # bosh_url:     # imported below
+  # bosh_sha1:    # imported below
 
   # stemcell_name:    # imported below
   # stemcell_version: # imported below
@@ -100,15 +100,15 @@ imported_vars:
         from: depl-vars
         path: /stemcell_sha1
 
-      - name: bosh_precompiled_version
+      - name: bosh_version
         from: depl-vars
-        path: /bosh_precompiled_version
-      - name: bosh_precompiled_url
+        path: /bosh_version
+      - name: bosh_url
         from: depl-vars
-        path: /bosh_precompiled_url
-      - name: bosh_precompiled_sha1
+        path: /bosh_url
+      - name: bosh_sha1
         from: depl-vars
-        path: /bosh_precompiled_sha1
+        path: /bosh_sha1
 
       # For 'remove-garden.yml' ops file
       - name: garden_backend_ip
