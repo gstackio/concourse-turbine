@@ -41,7 +41,7 @@ operations_files:
   30_local:
     - keep-bosh-agent
     - pin-stemcell-version
-    - pin-bosh-version-precompiled
+    - pin-bosh-version
     - disable-resurrector
     - set-disk-size
     - scale-vm-size

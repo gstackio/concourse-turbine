@@ -29,8 +29,8 @@ operations_files:
     - jumpbox-user
   30_local:
     - keep-bosh-agent
-    - custom-stemcell-version
-    - custom-bosh-version-precompiled
+    - pin-stemcell-version
+    - pin-bosh-version
     - set-disk-size
     - scale-vm-size
     - retain-garden-only
