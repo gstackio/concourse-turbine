@@ -2,6 +2,7 @@
 subsys:
   name: harbor
   type: bosh-deployment
+  depends_on: [ concourse ]
 
 input_resources:
   - name: harbor-boshrelease
