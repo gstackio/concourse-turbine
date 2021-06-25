@@ -8,5 +8,5 @@ git_commit_name: Gstack Concourse Ninja
 docker_ops_image_repo: harbor.ci.gstack.io/gstack/gk-ops
 docker_registry_username: admin
 
-stemcell_version_constraint: "0.latest"
+stemcell_version_constraint: "1.latest"
 concourse_version_constraint: v6.7.* # tag_filter: v6.7.* tag_regex: v(6\.7\.\d+)
