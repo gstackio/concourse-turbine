@@ -28,8 +28,6 @@ operations_files:
     - cluster/operations/tls-vars
     - cluster/operations/storage-driver
     - cluster/operations/enable-redacting-credentials
-    - cluster/operations/backup-atc
-    - cluster/operations/secure-internal-postgres-bbr
   30_local:
     - pin-stemcell
     - set-log-level
@@ -37,6 +35,10 @@ operations_files:
     - encryption-vars       # augments 'cluster/operations/encryption'
     - credhub-integration-with-uaa-and-db-tls
     - routing
+  40_concourse-deployment:
+    - cluster/operations/backup-atc
+    - cluster/operations/secure-internal-postgres-bbr
+  50_local:
     - pin-bbr-version
     - secure-internal-postgres-bbr-ca
     - backup-credhub
