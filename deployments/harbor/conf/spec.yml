@@ -63,8 +63,10 @@ deployment_vars:
   # harbor_version: "1.8.2"
   # harbor_sha1: 28a3fdf5c842cf4a3de003a8066687aed8201da7
 
-  # stemcell_os:      # imported below
-  # stemcell_version: # imported below
+  stemcell_name: bosh-warden-boshlite-ubuntu-xenial-go_agent
+  stemcell_os: ubuntu-xenial
+  stemcell_version: "621.125"
+  stemcell_sha1: f399044d2ebe3351f0f1b0b3f97ef11464d283b4
 
 
   # Reference declarations
@@ -107,15 +109,3 @@ imported_vars:
       - name: default_ca
         from: depl-creds
         path: /concourse-internal-ca
-
-  - subsys: traefik
-    imports:
-
-      # Versions
-
-      - name: stemcell_os
-        from: depl-vars
-        path: /stemcell_os
-      - name: stemcell_version
-        from: depl-vars
-        path: /stemcell_version
