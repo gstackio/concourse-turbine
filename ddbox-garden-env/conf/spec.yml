@@ -70,8 +70,8 @@ deployment_vars:
   bosh_sha1: 7da6c331bd5a17ed43e57ae5ae70ec2717046c23
 
   stemcell_name: bosh-vsphere-esxi-ubuntu-bionic-go_agent
-  stemcell_version: "0.28"
-  stemcell_sha1: 96c6b34a9035b4c172c2a2d84a7f44cbcef40ac1
+  stemcell_version: "1.10"
+  stemcell_sha1: a6fe3086c751ee421364f73cd1eac0f9c1cdec71
 
 
 imported_vars:
