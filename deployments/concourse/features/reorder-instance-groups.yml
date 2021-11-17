@@ -12,7 +12,7 @@
     instances: 1
     azs: ((azs))
     networks: [ { name: ((network_name)) } ]
-    stemcell: xenial
+    stemcell: bionic
     vm_type: ((db_vm_type))
     persistent_disk_type: ((db_persistent_disk_type))
     jobs:

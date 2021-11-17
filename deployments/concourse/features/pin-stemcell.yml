@@ -1,9 +1,9 @@
 ---
 
-- path: /stemcells/alias=xenial/os
+- path: /stemcells/alias=bionic/os
   type: replace
   value: ((stemcell_os))
 
-- path: /stemcells/alias=xenial/version
+- path: /stemcells/alias=bionic/version
   type: replace
   value: ((stemcell_version))

@@ -80,7 +80,7 @@
     instances: 1
     azs: ((azs))
     networks: [ { name: ((network_name)) } ]
-    stemcell: xenial
+    stemcell: bionic
     vm_type: default
 
 - path: /instance_groups/name=uaa:after
@@ -90,7 +90,7 @@
     instances: 1
     azs: ((azs))
     networks: [ { name: ((network_name)) } ]
-    stemcell: xenial
+    stemcell: bionic
     vm_type: default
 
 
@@ -544,7 +544,7 @@
 
 - path: /instance_groups/name=web/jobs/name=web/properties/postgresql/ca_cert?
   type: replace
-  value: ((database-tls.ca))
+  value: ((concourse-internal-ca))
 
 
 - path: /instance_groups/name=credhub/jobs/name=credhub/properties/credhub/data_storage/require_tls?
