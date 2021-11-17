@@ -20,5 +20,5 @@
       #   health_filter: smart
       # - domain: credhub.((concourse_external_domain)) # Credhub external FQDN
       #   health_filter: smart
-      - domain: harbor.((concourse_external_domain))  # Harbor external FQDN
-        health_filter: smart
+      # - domain: harbor.((concourse_external_domain))  # Harbor external FQDN
+      #   health_filter: smart

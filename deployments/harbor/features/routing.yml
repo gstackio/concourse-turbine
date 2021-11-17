@@ -1,18 +1,27 @@
 ---
 
+# Harbor implements some cron that make a request on ((hostname)). In our
+# setup, these requests go through Traefik.
+#
+# It turns out that when Traefik exceeds its Let'S Encrypt API quotas, then
+# the Harbor "self-readiness" health check fails. Then some health check loop
+# in the 'ctl' script fails. (Notice: such check is supposed to be
+# implemented in 'post-start' script instead). This make bosh deployment
+# fail, whereas Harbor is actualy working properly.
+
 - path: /instance_groups/name=harbor-app/jobs/name=harbor/custom_provider_definitions?
   type: replace
   value:
     - name: harbor-address
       type: address
 
-# - path: /instance_groups/name=harbor-app/jobs/name=harbor/provides?/harbor-address
-#   type: replace
-#   value:
-#     shared: false
-#     aliases:
-#       - domain: ((hostname))
-#         health_filter: smart
+- path: /instance_groups/name=harbor-app/jobs/name=harbor/provides?/harbor-address
+  type: replace
+  value:
+    shared: true
+    aliases:
+      - domain: ((hostname))
+        health_filter: smart
 
 - path: /addons/name=harbor-bosh-dns
   type: remove

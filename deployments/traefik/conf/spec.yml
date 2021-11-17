@@ -22,7 +22,7 @@ operations_files:
   20_local:
     - pin-stemcell
     - scale-disk
-    # - activate-debug
+    - activate-debug
     - routing
     - internal-split-dns
     - traefik-config
