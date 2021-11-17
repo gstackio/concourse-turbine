@@ -1,0 +1,9 @@
+---
+
+- path: /instance_groups/name=traefik/jobs/name=smoke-tests/properties?
+  type: replace
+  value:
+    # NOTE: for smoke tests to succeed when Let's Encrypt is
+    # enabled, 'frontend_hostname' must be a DNS name for which Traefik will
+    # be able to generate a valid Let's Encrypt certificate.
+    frontend_hostname: ((smoke_tests_frontend_hostname))

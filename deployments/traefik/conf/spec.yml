@@ -26,6 +26,7 @@ operations_files:
     - routing
     - internal-split-dns
     - traefik-config
+    - smoke-tests-setup
 
 variables_files:
   10_local:
@@ -70,6 +71,10 @@ imported_vars:
         from: vars-file
         file: private-config
         value: traefik.((traefik_domain))
+      - name: smoke_tests_frontend_hostname
+        from: vars-file
+        file: private-config
+        value: traefik-smoke-tests.((traefik_domain))
 
   - subsys: ddbox-garden-env # instead of generic 'base-env', to be fixed
     imports:
