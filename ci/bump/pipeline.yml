@@ -281,6 +281,38 @@ jobs:
 
       - *git_push_task
 
+  - name: detect-bosh-director
+    serial: true
+    serial_groups: [ detect ]
+    plan:
+      - in_parallel:
+          - get: bosh-director-bosh-io-release
+            trigger: true
+            params: { tarball: false }
+          - get: concourse-turbine
+          - get: image
+          - get: gk-automation
+
+      - task: capture-bosh-director-version
+        image: image
+        file: concourse-turbine/ci/bump/tasks/capture-artifact-version.yml
+        input_mapping:
+          artifact: bosh-director-bosh-io-release
+
+      - task: bump-bosh-director-version
+        image: image
+        file: concourse-turbine/ci/bump/tasks/bump-deployment-vars.yml
+        input_mapping:
+          git: concourse-turbine
+        params:
+          SPEC_FILE: ddbox-garden-env/conf/spec.yml
+          YAML_PROP_PREFIX: bosh
+          ARTIFACT_HUMAN_NAME: BOSH Director BOSH Release
+
+      - *git_commit_task
+
+      - *git_push_task
+
 
 resources:
 
@@ -345,6 +377,12 @@ resources:
     type: bosh-io-release
     source:
       repository: cloudfoundry-incubator/backup-and-restore-sdk-release
+    check_every: 24h
+
+  - name: bosh-director-bosh-io-release
+    type: bosh-io-release
+    source:
+      repository: cloudfoundry/bosh
     check_every: 24h
 
   - name: traefik-boshrelease-gh-release

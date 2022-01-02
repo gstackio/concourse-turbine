@@ -66,7 +66,6 @@ deployment_vars:
   # Versions
 
   bosh_version: "271.8.0"
-  bosh_url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=271.8.0
   bosh_sha1: 7da6c331bd5a17ed43e57ae5ae70ec2717046c23
 
   stemcell_name: bosh-vsphere-esxi-ubuntu-bionic-go_agent
@@ -75,6 +74,12 @@ deployment_vars:
 
 
 imported_vars:
+  - subsys: ddbox-garden-env # auto-import trick
+    imports:
+      - name: bosh_url
+        from: depl-vars
+        value: https://bosh.io/d/github.com/cloudfoundry/bosh?v=((bosh_version))
+
   - subsys: ddbox-bosh-env
     imports:
 

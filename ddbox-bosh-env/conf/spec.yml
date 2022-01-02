@@ -105,7 +105,7 @@ imported_vars:
         path: /bosh_version
       - name: bosh_url
         from: depl-vars
-        path: /bosh_url
+        value: https://bosh.io/d/github.com/cloudfoundry/bosh?v=((bosh_version))
       - name: bosh_sha1
         from: depl-vars
         path: /bosh_sha1
