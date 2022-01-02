@@ -82,6 +82,56 @@ The Concourse Cluster from Easy Foundry has these charateristics:
 
 
 
+Quick Start
+-----------
+
+Prerequisites:
+- Direnv should be installed. Follow instructions from [direnv.net][direnv].
+- VirtualBox v5.2 should be installed. Contributions are welcome for
+  supporting newer versions. We are using [this Ansible Role][vbox52role] for
+  that.
+
+```bash
+git clone https://github.com/gstackio/concourse-turbine.git
+cd concourse-turbine
+direnv allow
+git clone https://github.com/gstackio/turbine-cli.git .cache/turbine-cli
+vim ddbox-bosh-env/conf/spec.yml   # edit value for 'external_ip:'
+vim ddbox-garden-env/conf/spec.yml # edit value for 'external_ip:'
+TURBINE_ENVIRONMENT=ddbox-garden-env infra up
+TURBINE_ENVIRONMENT=ddbox-bosh-env infra up
+```
+
+[direnv]: https://direnv.net/
+[vbox52role]: https://github.com/gstackio/gstack-bosh-environment/tree/master/ddbox-standalone-bosh-env/provision/roles/virtualbox
+
+
+
+Upgrading
+---------
+
+```bash
+git pull
+TURBINE_ENVIRONMENT=ddbox-garden-env infra up
+TURBINE_ENVIRONMENT=ddbox-bosh-env   infra up
+infra recover -y traefik concourse harbor
+infra converge --dry-run traefik
+infra converge -y concourse harbor traefik
+```
+
+
+
+Housekeeping
+------------
+
+Pruning stale workers is required once in a while.
+
+```bash
+fly -t gk-plat-ops workers | tail +3 | cut -d" " -f1 | xargs -n1 fly -t gk-plat-ops prune-worker -w
+```
+
+
+
 Contributing
 ------------
 
