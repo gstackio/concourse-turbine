@@ -111,17 +111,17 @@ deployment_vars:
 
   network_name: concourse-network
 
-  web_ip0: 10.244.16.67
-  web_ip1: 10.244.16.68
+  # web_ip0:     # imported below
+  # web_ip1:     # imported below
   atc_tls_bind_port: 4443
   web_network_vm_extension: (( prune ))
 
-  credhub_ip0: 10.244.16.83
-  credhub_ip1: 10.244.16.84
+  # credhub_ip0: # imported below
+  # credhub_ip1: # imported below
   credhub_tls_port: 8844
 
-  uaa_ip0: 10.244.16.99
-  uaa_ip1: 10.244.16.100
+  # uaa_ip0:     # imported below
+  # uaa_ip1:     # imported below
   uaa_tls_port: 8443
 
 
@@ -164,3 +164,26 @@ imported_vars:
       - name: traefik_ca_cert
         from: depl-creds
         path: /traefik_ca/certificate
+
+  - subsys: cloud-config
+    imports:
+      - name: web_ip0
+        from: conf-vars
+        value: ((cidr_prefix)).16.67
+      - name: web_ip1
+        from: conf-vars
+        value: ((cidr_prefix)).16.68
+
+      - name: credhub_ip0
+        from: conf-vars
+        value: ((cidr_prefix)).16.83
+      - name: credhub_ip1
+        from: conf-vars
+        value: ((cidr_prefix)).16.84
+
+      - name: uaa_ip0
+        from: conf-vars
+        value: ((cidr_prefix)).16.99
+      - name: uaa_ip1
+        from: conf-vars
+        value: ((cidr_prefix)).16.100

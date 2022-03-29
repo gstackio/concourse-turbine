@@ -72,7 +72,7 @@ deployment_vars:
   # Reference declarations
 
   network_name: harbor-network
-  static_ip: 10.244.20.10
+  # static_ip:  # imported below
 
 
 
@@ -109,3 +109,9 @@ imported_vars:
       - name: default_ca
         from: depl-creds
         path: /concourse-internal-ca
+
+  - subsys: cloud-config
+    imports:
+      - name: static_ip
+        from: conf-vars
+        value: ((cidr_prefix)).20.10

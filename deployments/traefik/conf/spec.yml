@@ -88,38 +88,65 @@ imported_vars:
         from: vars-file
         file: private-config
         path: /external_domain
-      - name: concourse_web_ip0
-        from: depl-vars
-        path: /web_ip0
-      - name: concourse_web_ip1
-        from: depl-vars
-        path: /web_ip1
+      # - name: concourse_web_ip0
+      #   from: depl-vars
+      #   path: /web_ip0
+      # - name: concourse_web_ip1
+      #   from: depl-vars
+      #   path: /web_ip1
       - name: concourse_tls_port
         from: depl-vars
         path: /atc_tls_bind_port
 
-      - name: concourse_credhub_ip0
-        from: depl-vars
-        path: /credhub_ip0
-      - name: concourse_credhub_ip1
-        from: depl-vars
-        path: /credhub_ip1
+      # - name: concourse_credhub_ip0
+      #   from: depl-vars
+      #   path: /credhub_ip0
+      # - name: concourse_credhub_ip1
+      #   from: depl-vars
+      #   path: /credhub_ip1
       - name: credhub_tls_port
         from: depl-vars
         path: /credhub_tls_port
 
-      - name: concourse_uaa_ip0
-        from: depl-vars
-        path: /uaa_ip0
-      - name: concourse_uaa_ip1
-        from: depl-vars
-        path: /uaa_ip1
+      # - name: concourse_uaa_ip0
+      #   from: depl-vars
+      #   path: /uaa_ip0
+      # - name: concourse_uaa_ip1
+      #   from: depl-vars
+      #   path: /uaa_ip1
       - name: uaa_tls_port
         from: depl-vars
         path: /uaa_tls_port
 
-  - subsys: harbor
+  # - subsys: harbor
+  #   imports:
+  #     - name: harbor_ip0
+  #       from: depl-vars
+  #       path: /static_ip
+
+  - subsys: cloud-config
     imports:
+      - name: concourse_web_ip0
+        from: conf-vars
+        value: ((cidr_prefix)).16.67 # typical code duplication to be fixed
+      - name: concourse_web_ip1
+        from: conf-vars
+        value: ((cidr_prefix)).16.68 # typical code duplication to be fixed
+
+      - name: concourse_credhub_ip0
+        from: conf-vars
+        value: ((cidr_prefix)).16.83 # typical code duplication to be fixed
+      - name: concourse_credhub_ip1
+        from: conf-vars
+        value: ((cidr_prefix)).16.84 # typical code duplication to be fixed
+
+      - name: concourse_uaa_ip0
+        from: conf-vars
+        value: ((cidr_prefix)).16.99 # typical code duplication to be fixed
+      - name: concourse_uaa_ip1
+        from: conf-vars
+        value: ((cidr_prefix)).16.100 # typical code duplication to be fixed
+
       - name: harbor_ip0
-        from: depl-vars
-        path: /static_ip
+        from: conf-vars
+        value: ((cidr_prefix)).20.10 # typical code duplication to be fixed

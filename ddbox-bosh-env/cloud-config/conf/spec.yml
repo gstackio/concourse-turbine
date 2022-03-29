@@ -28,6 +28,8 @@ config_vars:
   # Feel free to add more workers for environments with more cores.
   compilation_workers: 5
 
+  cidr_prefix: "10.244"
+
 
 imported_vars:
   - subsys: concourse

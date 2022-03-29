@@ -53,10 +53,8 @@ deployment_vars:
   vbox_host: ~
   vbox_username: ~
 
-  routable_network_cidr: 10.244.0.0/16
-
-  # web_router_ip: "10.244.0.34" # classical Gorouter reverse-proxy
-  web_router_ip: "10.244.0.43" # Træfik reverse-proxy for Let's Encrypt support
+  # routable_network_cidr:    # imported below
+  # web_router_ip:            # imported below
 
   internal_ip: "192.168.50.7"
   internal_gw: "192.168.50.1"
@@ -82,7 +80,18 @@ imported_vars:
 
   - subsys: ddbox-bosh-env
     imports:
-
       - name: blobstore_ip
         from: depl-vars
         path: /internal_ip
+
+  - subsys: cloud-config
+    imports:
+      - name: routable_network_cidr
+        from: conf-vars
+        value: ((cidr_prefix)).0.0/16
+      # - name: web_router_ip
+      #   from: conf-vars
+      #   value: ((cidr_prefix)).0.34 # classical Gorouter reverse-proxy
+      - name: web_router_ip
+        from: conf-vars
+        value: ((cidr_prefix)).0.43 # Træfik reverse-proxy for Let's Encrypt support
