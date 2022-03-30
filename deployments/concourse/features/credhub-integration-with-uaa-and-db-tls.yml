@@ -619,8 +619,8 @@
     type: certificate
     options:
       ca: concourse-internal-ca
-      common_name: q-s0.db.((network_name)).((deployment_name)).bosh
+      common_name: "*.db.((network_name)).((deployment_name)).bosh"
       alternative_names:
-        - q-s0.db.((network_name)).((deployment_name)).bosh
+        - "*.db.((network_name)).((deployment_name)).bosh"
         - 127.0.0.1
     update_mode: converge

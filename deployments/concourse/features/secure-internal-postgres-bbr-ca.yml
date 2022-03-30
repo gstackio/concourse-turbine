@@ -3,3 +3,46 @@
 - path: /variables/name=postgres_client_tls/options/ca
   type: replace
   value: concourse-internal-ca
+
+
+# In order to fix such errors:
+#
+# [bbr] 2022/03/28 15:07:05 ERROR - Error backing up bbr-atcdb on db/420ac484-e6e2-4316-a6bc-a313c1cdfe53.
+# [bbr] 2022/03/28 15:07:06 ERROR - Error backing up bbr-credhubdb on credhub/958da11e-629e-4bb6-ae0c-0f992a532e6c.
+# [bbr] 2022/03/28 15:07:06 ERROR - Error backing up bbr-credhubdb on credhub/72818850-0c2c-4e33-adb8-4fbf01e490ea.
+#
+# + /var/vcap/packages/database-backup-restorer-postgres-11/bin/psql
+#     'host=10.244.16.128 user=concourse password=<redacted> port=5432 dbname=atc
+#         sslrootcert=/var/vcap/jobs/bbr-atcdb/config/env/CONCOURSE_TLS_CA
+#         sslcert=/var/vcap/jobs/bbr-atcdb/config/env/CONCOURSE_TLS_CERTIFICATE
+#         sslkey=/var/vcap/jobs/bbr-atcdb/config/env/CONCOURSE_TLS_PRIVATE_KEY
+#         sslmode=verify-full'
+#     -c 'UPDATE components SET paused = true WHERE name IN ('\''tracker'\'','\''collector_pipelines'\'');'
+#
+# psql: server certificate for "q-s0.db.concourse-network.concourse.bosh" does
+# not match host name "10.244.16.128" - exit code 2error 2:
+#
+# Which occues because TLS certificate doesn't cover the IP address of
+# Postgres instances.
+#
+# We need this expression (from config.json template of 'bbr-atcdb' job)
+#     link("postgres").instances.first.address
+# to output the DNS name of the Postgres instance.
+#
+# With UAA the config.json from 'bbr-uaadb' job is using
+#     link('uaa_db').p('uaadb.address')
+# from UAA job properties, which properly specifies the DNS name.
+#
+# For credhub we use
+#     link("credhub_db").instances[0].address
+# whereas we could use
+#     link("credhub_db").p("credhub.data_storage.host")
+
+
+# In order to solve the issue depicted above, we ensure here
+# that '.instances.first.address' or '.instances[0].address' are providing
+# Bosh DNS names.
+
+- path: /features?/use_dns_addresses
+  type: replace
+  value: true
