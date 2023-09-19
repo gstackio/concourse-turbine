@@ -34,6 +34,7 @@ operations_files:
     - set-disk-size
     - scale-vm-size
     - retain-garden-only
+    - custom-garden-cidr
 
 variables_files:
   10_local:

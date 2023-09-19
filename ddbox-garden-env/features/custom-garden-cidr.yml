@@ -1,0 +1,5 @@
+---
+
+- path: /instance_groups/name=garden/properties/warden_cpi/no_masq_cidrs?
+  type: replace
+  value: [ ((routable_network_cidr)) ]
