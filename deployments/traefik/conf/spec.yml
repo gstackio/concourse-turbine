@@ -76,11 +76,16 @@ imported_vars:
         file: private-config
         value: traefik-smoke-tests.((traefik_domain))
 
-  - subsys: ddbox-garden-env # instead of generic 'base-env', to be fixed
+  # - subsys: ddbox-garden-env # instead of generic 'base-env', to be fixed
+  #   imports:
+  #     - name: static_ip
+  #       from: depl-vars
+  #       path: /web_router_ip
+  - subsys: cloud-config
     imports:
       - name: static_ip
-        from: depl-vars
-        path: /web_router_ip
+        from: conf-vars
+        value: ((cidr_prefix)).0.43 # typical code duplication to be fixed
 
   - subsys: concourse
     imports:
