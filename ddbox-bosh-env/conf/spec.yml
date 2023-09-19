@@ -47,6 +47,7 @@ operations_files:
     - scale-vm-size
     - enable-index-based-dns-aliases
     - remove-garden
+    - extend-certificates-duration
     - uaa-bosh-lite
     - credhub-bosh-lite
 

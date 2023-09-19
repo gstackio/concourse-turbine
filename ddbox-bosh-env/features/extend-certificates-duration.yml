@@ -1,0 +1,24 @@
+---
+
+# Ref: https://github.com/cloudfoundry/bosh-deployment/issues/365#issuecomment-527924411
+
+- type: replace
+  path: /variables/name=mbus_bootstrap_ssl/options?/duration?
+  value: 913
+- type: replace
+  path: /variables/name=director_ssl/options?/duration?
+  value: 913
+
+- type: replace
+  path: /variables/name=credhub_ca/options?/duration?
+  value: 913
+- type: replace
+  path: /variables/name=credhub_tls/options?/duration?
+  value: 913
+
+- type: replace
+  path: /variables/name=uaa_ssl/options?/duration?
+  value: 913
+- type: replace
+  path: /variables/name=uaa_service_provider_ssl/options?/duration?
+  value: 913

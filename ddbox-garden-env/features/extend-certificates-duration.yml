@@ -1,0 +1,26 @@
+---
+
+# Ref: https://github.com/cloudfoundry/bosh-deployment/issues/365#issuecomment-527924411
+
+
+- path: /variables/name=default_ca/options?/duration?
+  type: replace
+  value: 913
+- path: /variables/name=nats_ca/options?/duration?
+  type: replace
+  value: 913
+- path: /variables/name=nats_server_tls/options?/duration?
+  type: replace
+  value: 913
+- path: /variables/name=nats_clients_director_tls/options?/duration?
+  type: replace
+  value: 913
+- path: /variables/name=nats_clients_health_monitor_tls/options?/duration?
+  type: replace
+  value: 913
+- path: /variables/name=blobstore_ca/options?/duration?
+  type: replace
+  value: 913
+- path: /variables/name=blobstore_server_tls/options?/duration?
+  type: replace
+  value: 913
