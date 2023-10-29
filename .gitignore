@@ -1,5 +1,6 @@
 /.cache/
 /bin/bbl
+/bin/bbr
 /bin/terraform
 /bin/bosh
 /bin/dnscontrol
