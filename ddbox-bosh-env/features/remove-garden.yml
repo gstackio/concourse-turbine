@@ -1,10 +1,5 @@
 ---
 
-- path: /name
-  type: replace
-  value: easyfoundry-bosh
-
-
 - path: /releases/name=bosh-warden-cpi
   type: remove
 
