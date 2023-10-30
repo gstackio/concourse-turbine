@@ -24,7 +24,6 @@ main_deployment_file: bosh-deployment/bosh.yml
 operations_files:
   10_bosh-deployment:
     - virtualbox/cpi
-    - virtualbox/remote
     - bosh-lite
     - jumpbox-user
   30_local:
@@ -89,14 +88,17 @@ imported_vars:
         from: depl-vars
         path: /internal_ip
 
+      - name: nats_ip
+        from: depl-vars
+        path: /internal_ip
+
   - subsys: cloud-config
     imports:
       - name: routable_network_cidr
         from: conf-vars
         value: ((cidr_prefix)).0.0/16
-      # - name: web_router_ip
-      #   from: conf-vars
-      #   value: ((cidr_prefix)).0.34 # classical Gorouter reverse-proxy
+
       - name: web_router_ip
         from: conf-vars
+        # value: ((cidr_prefix)).0.34 # classical Gorouter reverse-proxy
         value: ((cidr_prefix)).0.43 # Træfik reverse-proxy for Let's Encrypt support

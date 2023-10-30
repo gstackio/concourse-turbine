@@ -1,26 +1,24 @@
 ---
 
-# Only keep Virtualbox CPI, BPM, Garden-runC, and GrootFS releases
+# Remove unnecessary release
+- path: /releases/name=bosh
+  type: remove
 
-  # - path: /releases/name=bosh
-  #   type: remove
-
-
-# Only keep Garden, Groot, Warden CPI and NATS jobs
-
+# Remove unnecessary jobs
+- path: /instance_groups/name=bosh/jobs/name=nats
+  type: remove
 - path: /instance_groups/name=bosh/jobs/name=postgres-10
   type: remove
-
 - path: /instance_groups/name=bosh/jobs/name=blobstore
   type: remove
-
 - path: /instance_groups/name=bosh/jobs/name=director
   type: remove
-
 - path: /instance_groups/name=bosh/jobs/name=health_monitor
   type: remove
 
-
+# Remove unnecessary config sections
+- path: /instance_groups/name=bosh/properties/agent
+  type: remove
 - path: /instance_groups/name=bosh/properties/blobstore
   type: remove
 - path: /instance_groups/name=bosh/properties/compiled_package_cache
@@ -29,71 +27,56 @@
   type: remove
 - path: /instance_groups/name=bosh/properties/hm
   type: remove
+- path: /instance_groups/name=bosh/properties/nats
+  type: remove
 - path: /instance_groups/name=bosh/properties/postgres
   type: remove
 
-# The BPM job need some empty hash of properties otherwise the BOSH ERB
-# Renderer script fails with a "no implicit conversion of nil into Hash"
-# TypeError.
-- path: /instance_groups/name=bosh/jobs/name=bpm/properties?
-  type: replace
-  value: {}
-
-
-- path: /instance_groups/name=bosh/properties/agent/env/bosh/blobstores/0/options/endpoint
-  type: replace
-  value: http://((blobstore_ip)):25250
-
-
-- path: /variables/name=admin_password
-  type: remove
-
-- path: /variables/name=hm_password
-  type: remove
-
-- path: /variables/name=postgres_password
-  type: remove
-
-- path: /variables/name=director_ssl
-  type: remove
-
-# We generate these credentials here for deployment order purpose
-# - path: /variables/name=blobstore_director_password
-#   type: remove
-# - path: /variables/name=blobstore_agent_password
-#   type: remove
-# - path: /variables/name=blobstore_ca
-#   type: remove
-# - path: /variables/name=blobstore_server_tls
-#   type: remove
-- path: /variables/name=blobstore_server_tls/options/alternative_names/0
-  type: replace
-  value: ((blobstore_ip))
-
-
-# - type: replace
-#   path: /variables/name=nats_server_tls/options/alternative_names?/-
-#   value: ((internal_ip))
-
-# - type: replace
-#   path: /variables/name=blobstore_server_tls/options/alternative_names/-
-#   value: ((internal_ip))
-
-
-# And open the Garden backend socket to any remote IP.
-#
-# This Garden backend is not protected by any kind of password or encryption,
-# so this port should never be exposed to the Internet.
-- path: /instance_groups/name=bosh/jobs/name=garden/properties?/garden/listen_address
-  type: replace
-  value: 0.0.0.0:7777 # maybe use ((garden_backend_ip)) here
-
-
-# Finally, rename the instance group
+# Now the instance group is officially named 'garden'
 - path: /instance_groups/name=bosh/name
   type: replace
   value: garden
 
 
-# FIXME: 'gbe_up()' calls the 'alias_env()' function fails at calling
-# 'env_exports()' and at aliasing the environment.
+# The BPM job need some empty hash of properties, otherwise the Bosh ERB
+# renderer script fails with a "no implicit conversion of nil into Hash"
+# TypeError
+- path: /instance_groups/name=garden/jobs/name=bpm/properties?
+  type: replace
+  value: {}
+
+# Adjust NATS config, with NATS server being distant
+- path: /instance_groups/name=garden/properties/warden_cpi/agent/mbus
+  type: replace
+  value: nats://nats:((nats_password))@((nats_ip)):4222
+
+# Remove unnecessary secrets
+- path: /variables/name=admin_password
+  type: remove
+- path: /variables/name=hm_password
+  type: remove
+- path: /variables/name=postgres_password
+  type: remove
+- path: /variables/name=director_ssl
+  type: remove
+
+# Remove unnecessary Blobstore secrets
+- path: /variables/name=blobstore_director_password
+  type: remove
+- path: /variables/name=blobstore_agent_password
+  type: remove
+- path: /variables/name=blobstore_ca
+  type: remove
+- path: /variables/name=blobstore_server_tls
+  type: remove
+
+# Remove unnecessary NATS secrets, excepted NATS password which is generated
+# here by the Garden deployment, that occurs first
+- path: /variables/name=nats_ca
+  type: remove
+- path: /variables/name=nats_server_tls
+  type: remove
+- path: /variables/name=nats_clients_director_tls
+  type: remove
+- path: /variables/name=nats_clients_health_monitor_tls
+  type: remove

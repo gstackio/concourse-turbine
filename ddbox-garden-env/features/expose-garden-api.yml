@@ -1,0 +1,10 @@
+---
+
+# Open the Garden backend socket to any remote IP.
+#
+# WARNING: this Garden backend is not protected by any kind of password or
+# encryption, so this port should never be exposed to the Internet.
+
+- path: /instance_groups/name=garden/jobs/name=garden/properties?/garden/listen_address
+  type: replace
+  value: 0.0.0.0:7777
