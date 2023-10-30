@@ -31,8 +31,6 @@ operations_files:
     - virtualbox/cpi
     - virtualbox/remote
     - bosh-lite
-    - experimental/blobstore-https
-    - experimental/blobstore-https-bosh-lite
     - jumpbox-user
     - uaa
     - credhub
