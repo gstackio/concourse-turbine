@@ -1,0 +1,19 @@
+---
+
+# Make the Shadow CPI the primary CPI in single-CPI environments
+
+- path: /instance_groups/name=bosh/jobs/name=shadow-cpi?
+  type: replace
+  value:
+    name: shadow-cpi
+    release: bosh-shadow-cpi
+    properties:
+      ssh:
+        remote-host: ((garden_backend_ip))
+        remote-user: jumpbox
+        private-key: ((garden_jumpbox_ssh_private_key))
+      remote-cpi-binary: /var/vcap/jobs/warden_cpi/bin/cpi
+
+- path: /instance_groups/name=bosh/properties/director/cpi_job
+  type: replace
+  value: shadow-cpi
