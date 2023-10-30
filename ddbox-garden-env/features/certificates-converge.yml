@@ -1,0 +1,5 @@
+---
+
+- path: /variables/name=default_ca/update_mode?
+  type: replace
+  value: converge

@@ -48,7 +48,8 @@ operations_files:
     - remove-garden
     - shadow-cpi
     - shadow-cpi-primary
-    - extend-certificates-duration
+    - certificates-extend-duration
+    - certificates-converge
     - uaa-bosh-lite
     - credhub-bosh-lite
 

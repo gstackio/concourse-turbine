@@ -34,7 +34,8 @@ operations_files:
     - set-disk-size
     - scale-vm-size
     - retain-garden-only
-    - extend-certificates-duration
+    - certificates-extend-duration
+    - certificates-converge
     - custom-garden-cidr
 
 variables_files:

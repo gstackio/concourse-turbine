@@ -1,0 +1,42 @@
+---
+
+- path: /variables/name=mbus_bootstrap_ssl/update_mode?
+  type: replace
+  value: converge
+- path: /variables/name=director_ssl/update_mode?
+  type: replace
+  value: converge
+
+- path: /variables/name=nats_ca/update_mode?
+  type: replace
+  value: converge
+- path: /variables/name=nats_server_tls/update_mode?
+  type: replace
+  value: converge
+- path: /variables/name=nats_clients_director_tls/update_mode?
+  type: replace
+  value: converge
+- path: /variables/name=nats_clients_health_monitor_tls/update_mode?
+  type: replace
+  value: converge
+
+- path: /variables/name=blobstore_ca/update_mode?
+  type: replace
+  value: converge
+- path: /variables/name=blobstore_server_tls/update_mode?
+  type: replace
+  value: converge
+
+- path: /variables/name=credhub_ca/update_mode?
+  type: replace
+  value: converge
+- path: /variables/name=credhub_tls/update_mode?
+  type: replace
+  value: converge
+
+- path: /variables/name=uaa_ssl/update_mode?
+  type: replace
+  value: converge
+- path: /variables/name=uaa_service_provider_ssl/update_mode?
+  type: replace
+  value: converge
