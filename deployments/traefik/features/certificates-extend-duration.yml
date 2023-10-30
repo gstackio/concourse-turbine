@@ -1,0 +1,8 @@
+---
+
+- path: /variables/name=api_tls/options?/duration
+  type: replace
+  value: 913
+- path: /variables/name=traefik_ca/options?/duration
+  type: replace
+  value: 913

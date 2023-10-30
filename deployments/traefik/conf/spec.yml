@@ -25,6 +25,7 @@ operations_files:
     - activate-debug
     - routing
     - internal-split-dns
+    - certificates-extend-duration
     - traefik-config
     - smoke-tests-setup
 
