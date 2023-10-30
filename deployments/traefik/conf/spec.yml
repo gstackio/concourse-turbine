@@ -51,8 +51,8 @@ deployment_vars:
 
   stemcell_name: bosh-warden-boshlite-ubuntu-bionic-go_agent
   stemcell_os: ubuntu-bionic
-  stemcell_version: "1.41"
-  stemcell_sha1: 5ee4781aea5d58eeb98425e38d95e931756a9f50
+  stemcell_version: "1.204"
+  stemcell_sha1: 22a3efed13dbd16f8949c5a03a1e628e1fb1c16d
 
 
   # Reference declarations
