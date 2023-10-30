@@ -3,6 +3,6 @@
 # Ref: https://github.com/cloudfoundry/bosh-deployment/issues/365#issuecomment-527924411
 
 
-- path: /variables/name=default_ca/options?/duration?
+- path: /variables/name=default_ca/options?/duration
   type: replace
   value: 913
