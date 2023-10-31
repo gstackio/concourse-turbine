@@ -26,13 +26,11 @@ operations_files:
     - virtualbox/cpi
     - bosh-lite
     - jumpbox-user
-    - misc/source-releases/bosh
   30_local:
     - rename-deployment
-    - bionic-use-vbox-ide-disk-ctlr
     - keep-bosh-agent
-    - pin-stemcell-version
-    - pin-garden-version
+    # - pin-stemcell-version
+    # - pin-garden-version
     - set-disk-size
     - scale-vm-size
     - retain-garden-only
