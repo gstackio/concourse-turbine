@@ -7,7 +7,7 @@
 # Remove unnecessary jobs
 - path: /instance_groups/name=bosh/jobs/name=nats
   type: remove
-- path: /instance_groups/name=bosh/jobs/name=postgres-10
+- path: /instance_groups/name=bosh/jobs/name=postgres
   type: remove
 - path: /instance_groups/name=bosh/jobs/name=blobstore
   type: remove
@@ -72,6 +72,8 @@
 
 # Remove unnecessary NATS secrets, excepted NATS password which is generated
 # here by the Garden deployment, that occurs first
+- path: /variables/name=nats_sync_password
+  type: remove
 - path: /variables/name=nats_ca
   type: remove
 - path: /variables/name=nats_server_tls

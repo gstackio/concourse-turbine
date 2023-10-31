@@ -1,9 +1,17 @@
 ---
 
-- path: /releases/name=bosh?
+- path: /releases/name=garden-runc?
   type: replace
   value:
-    name: bosh
-    version: ((bosh_version))
-    url: ((bosh_url))
-    sha1: ((bosh_sha1))
+    name: "garden-runc"
+    version: "1.42.0"
+    url: "https://bosh.io/d/github.com/cloudfoundry/garden-runc-release?v=1.42.0"
+    sha1: "38cf466520571222e17250c59b343d9facae4b25"
+
+- path: /releases/name=bosh-warden-cpi?
+  type: replace
+  value:
+    name: "bosh-warden-cpi"
+    version: "44"
+    url: "https://bosh.io/d/github.com/cloudfoundry/bosh-warden-cpi-release?v=44"
+    sha1: "3fba92f0edcd5f367b3139e8434dda6b4c775c3c"
