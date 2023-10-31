@@ -31,7 +31,7 @@ operations_files:
     - bionic-use-vbox-ide-disk-ctlr
     - keep-bosh-agent
     - pin-stemcell-version
-    - pin-bosh-version
+    - pin-garden-version
     - set-disk-size
     - scale-vm-size
     - retain-garden-only
