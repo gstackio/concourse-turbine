@@ -1,0 +1,24 @@
+---
+
+# VirtualBox CPI v0.2.2+ has set the default 'storage_controller' value to
+# "sata" for virtualbox 6.1+ compatibility, but when using Bionic Stemcells
+# that have been imported by VirtualBox CPI v0.2.0 or prior, there is no
+# "sata" controller available, so you must use "ide".
+#
+# Typical error mesage at VM creation:
+#   CPI 'create_vm' method responded with error:
+#   ...
+#   "message":"Creating VM with agent ID '{{bla-bla-bla}}': Attaching
+#   ephemeral disk: Unknown controller name"
+#
+# When using Jammy Stemcells, it's the opposite: there is no IDE and only a
+# SATA controller, so you must import them with VirtualBox 0.2.2+ with
+# 'storage_controller' value set to its default, which is 'sata'.
+#
+# When a Stemcell is imported with the wrong 'storage_controller' setting,
+# it's doomed. Bionic imported with "sata" don't find a bootable disk, and Jammy
+# imported with "ide" lead to the "Unknown controller name" CPI error.
+
+- path: /cloud_provider/properties/storage_controller?
+  type: replace
+  value: ide

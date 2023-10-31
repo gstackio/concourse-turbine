@@ -28,6 +28,7 @@ operations_files:
     - jumpbox-user
   30_local:
     - rename-deployment
+    - bionic-use-vbox-ide-disk-ctlr
     - keep-bosh-agent
     - pin-stemcell-version
     - pin-bosh-version
