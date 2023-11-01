@@ -3,30 +3,6 @@
 - path: /instance_groups/name=db
   type: remove
 
-- path: /instance_groups/name=web:before
-  type: replace
-  value:
-    # NOTE: the instance group definition below is a pure copy/pase of the
-    # 'db' instance group in the 'concourse.yml' base deployment manifest.
-    name: db
-    instances: 1
-    azs: ((azs))
-    networks: [ { name: ((network_name)) } ]
-    stemcell: bionic
-    vm_type: ((db_vm_type))
-    persistent_disk_type: ((db_persistent_disk_type))
-    jobs:
-      - release: postgres
-        name: postgres
-        properties:
-          databases:
-            port: 5432
-            databases:
-              - name: atc
-            roles:
-              - name: concourse
-                password: ((postgres_password))
-
 - path: /update/serial
   type: replace
   value: true
@@ -34,3 +10,32 @@
 - path: /update/max_in_flight
   type: replace
   value: 1
+
+- path: /instance_groups/name=web:before
+  type: replace
+  value:
+    # NOTE: the instance group definition below is a plain extraction of the
+    # 'db' instance group from the 'cluster/concourse.yml' base deployment
+    # manifest template, automaticaly done by the 'pre-deploy.sh' hook in this
+    # Turbine Subsys. THE MARK BELOW MUST NOT BE REMOVED.
+    #
+    # ~~~START_OF_GENERATED_FOOTER~~~
+    azs: ((azs))
+    instances: 1
+    jobs:
+    - name: postgres
+      properties:
+        databases:
+          databases:
+          - name: atc
+          port: 5432
+          roles:
+          - name: concourse
+            password: ((postgres_password))
+      release: postgres
+    name: db
+    networks:
+    - name: ((network_name))
+    persistent_disk_type: ((db_persistent_disk_type))
+    stemcell: jammy
+    vm_type: ((db_vm_type))

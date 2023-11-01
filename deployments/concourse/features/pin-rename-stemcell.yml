@@ -1,6 +1,6 @@
 ---
 
-- path: /stemcells/alias=jammy
+- path: /stemcells/alias=jammy # <- alias extracted by 'pre-deploy.sh' hook from 'cluster/concourse.yml' manifest
   type: replace
   value:
     alias: default
