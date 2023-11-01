@@ -1,9 +1,20 @@
 ---
 
-- path: /stemcells/alias=bionic/os
+- path: /stemcells/alias=jammy
   type: replace
-  value: ((stemcell_os))
+  value:
+    alias: default
+    os: ((stemcell_os))
+    version: ((stemcell_version))
 
-- path: /stemcells/alias=bionic/version
+- path: /instance_groups/name=web/stemcell
   type: replace
-  value: ((stemcell_version))
+  value: default
+
+- path: /instance_groups/name=db/stemcell
+  type: replace
+  value: default
+
+- path: /instance_groups/name=worker/stemcell
+  type: replace
+  value: default

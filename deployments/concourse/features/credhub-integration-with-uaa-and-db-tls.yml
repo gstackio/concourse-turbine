@@ -80,7 +80,7 @@
     instances: 1
     azs: ((azs))
     networks: [ { name: ((network_name)) } ]
-    stemcell: bionic
+    stemcell: default
     vm_type: default
 
 - path: /instance_groups/name=uaa:after
@@ -90,7 +90,7 @@
     instances: 1
     azs: ((azs))
     networks: [ { name: ((network_name)) } ]
-    stemcell: bionic
+    stemcell: default
     vm_type: default
 
 
