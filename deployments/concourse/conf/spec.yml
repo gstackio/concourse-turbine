@@ -29,7 +29,7 @@ operations_files:
     - cluster/operations/storage-driver
     - cluster/operations/enable-redacting-credentials
   30_local:
-    - pin-stemcell
+    - pin-rename-stemcell
     - set-log-level
     - basic-auth-with-vars  # replaces 'cluster/operations/basic-auth'
     - encryption-vars       # augments 'cluster/operations/encryption'
