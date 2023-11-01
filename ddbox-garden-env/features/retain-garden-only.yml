@@ -48,7 +48,7 @@
 # Adjust NATS config, with NATS server being distant
 - path: /instance_groups/name=garden/properties/warden_cpi/agent/mbus
   type: replace
-  value: nats://nats:((nats_password))@((nats_ip)):4222
+  value: nats://((nats_ip)):4222
 
 # Remove unnecessary secrets
 - path: /variables/name=admin_password
