@@ -399,13 +399,13 @@ resources:
   - name: warden-stemcell
     type: bosh-io-stemcell
     source:
-      name: bosh-warden-boshlite-ubuntu-bionic-go_agent
+      name: bosh-warden-boshlite-((stemcell_os))-go_agent
       version_family: ((stemcell_version_constraint))
     check_every: 24h
 
   - name: vsphere-stemcell
     type: bosh-io-stemcell
     source:
-      name: bosh-vsphere-esxi-ubuntu-bionic-go_agent
+      name: bosh-vsphere-esxi-((stemcell_os))-go_agent
       version_family: ((stemcell_version_constraint))
     check_every: 24h
