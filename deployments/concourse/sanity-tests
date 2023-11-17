@@ -5,9 +5,9 @@ set -eo pipefail
 function main() {
     setup
 
-    local concourse_target=${1:-"ef"}
-
-    local pipeline_name=self-sanity-tests
+    # Global variables, so that the cleanup() exit function can access these:
+    concourse_target=${1:-"ef"}
+    pipeline_name=self-sanity-tests
 
     set -x
 
@@ -61,11 +61,6 @@ function main() {
 
     fly --target="${concourse_target}" trigger-job --watch \
         --job="${pipeline_name}/test-job"
-
-    # NOTE: we must exit from within this main() function, so that local vars
-    # 'concourse_target' and 'pipeline_name' can still be defined in the
-    # cleanup() function.
-    exit 0
 }
 
 function setup() {
@@ -75,6 +70,11 @@ function setup() {
 }
 
 function cleanup() {
+    if [[ -z ${concourse_target} || -z ${pipeline_name} ]]; then
+        echo "ERROR: missing 'concourse_target' or 'pipeline_name' info for proper cleanup." \
+            "Aborting cleanup."
+        return
+    fi
     fly -t "${concourse_target}" destroy-pipeline -n -p "${pipeline_name}" > /dev/null
 
     credhub delete --name "/concourse/main/team-var"
