@@ -1,0 +1,5 @@
+---
+
+- path: /instance_groups/name=web/jobs/name=web/properties/enable_across_step?
+  type: replace
+  value: true

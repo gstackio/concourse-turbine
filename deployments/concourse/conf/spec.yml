@@ -43,6 +43,10 @@ operations_files:
     - secure-internal-postgres-bbr-ca
     - backup-credhub
     - backup-uaa
+  # 60_concourse-deployment:
+  #   - cluster/operations/enable-global-resources  # Experimental
+  # 70_local:
+  #   - enable-across-steps                         # Experimental
     - trust-traefik-ca
     - certificates-extend-duration
     - static-web
