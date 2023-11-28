@@ -142,7 +142,7 @@ Please feel free to submit issues and pull requests.
 Author and License
 ------------------
 
-Copyright © 2018-2021, Benjamin Gandon, Gstack
+Copyright © 2018-present, Benjamin Gandon, Gstack
 
 Like BOSH and Turbine, this Turbine distrib is released under the terms of the
 [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0).
