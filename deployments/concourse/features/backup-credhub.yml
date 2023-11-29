@@ -1,6 +1,6 @@
 ---
 
-- path: /instance_groups/name=credhub/jobs/name=bbr-credhubdb?
+- path: /instance_groups/name=db/jobs/name=bbr-credhubdb?
   type: replace
   value:
     name: bbr-credhubdb
@@ -8,7 +8,7 @@
     properties:
       release_level_backup: true
 
-- path: /instance_groups/name=credhub/jobs/name=database-backup-restorer?
+- path: /instance_groups/name=db/jobs/name=database-backup-restorer?
   type: replace
   value:
     name: database-backup-restorer
