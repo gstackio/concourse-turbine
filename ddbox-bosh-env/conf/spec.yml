@@ -52,6 +52,7 @@ operations_files:
     - certificates-converge
     - uaa-bosh-lite
     - credhub-bosh-lite
+    - disable-short-lived-credentials
 
 variables_files:
   10_local:
