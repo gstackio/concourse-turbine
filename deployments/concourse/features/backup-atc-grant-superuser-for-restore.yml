@@ -1,0 +1,5 @@
+---
+
+- path: /instance_groups/name=db/jobs/name=postgres/properties/databases/roles/name=concourse/permissions?/-
+  type: replace
+  value: SUPERUSER

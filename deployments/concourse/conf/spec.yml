@@ -41,6 +41,7 @@ operations_files:
   50_local:
     - pin-bbr-version
     - secure-internal-postgres-bbr-ca
+    - backup-atc-grant-superuser-for-restore
     - backup-credhub
     - backup-uaa
   # 60_concourse-deployment:
