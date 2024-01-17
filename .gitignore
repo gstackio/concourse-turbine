@@ -22,3 +22,4 @@ bbl-state.json
 *.key
 *.key.json
 id_rsa
+*~
