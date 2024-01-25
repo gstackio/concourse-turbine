@@ -2,7 +2,7 @@
 subsys:
   name: ddbox-bosh-env
   type: bosh-environment
-  depends_on: [ ddboox-garden-env ]
+  depends_on: [ ddbox-garden-env ]
 
 input_resources:
   - name: bosh-deployment
