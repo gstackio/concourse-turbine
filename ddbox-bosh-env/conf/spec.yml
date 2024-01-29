@@ -39,7 +39,7 @@ operations_files:
   30_local:
     - rename-deployment
     - keep-bosh-agent
-    # - pin-stemcell-version
+    - pin-stemcell-version
     # - pin-bosh-version
     - disable-resurrector
     - set-disk-size

@@ -29,7 +29,7 @@ operations_files:
   30_local:
     - rename-deployment
     - keep-bosh-agent
-    # - pin-stemcell-version
+    - pin-stemcell-version
     # - pin-garden-version
     - set-disk-size
     - scale-vm-size
@@ -72,8 +72,8 @@ deployment_vars:
   bosh_sha1: 262d71de7c4c5859343dc5c516d05a127f4a6a78
 
   stemcell_name: bosh-vsphere-esxi-ubuntu-jammy-go_agent
-  stemcell_version: "1.340"
-  stemcell_sha1: cec8bde90d19f4ca682dad04ac0fdd97697fd3aa
+  stemcell_version: "1.351"
+  stemcell_sha1: 3d4e0327b084acaef339e39e5ab4929fc45fc74c
 
 
 imported_vars:
