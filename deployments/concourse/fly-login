@@ -15,7 +15,7 @@ function main() {
     local concourse_target=${1:-"${default_concourse_target}"}
     shift
 
-    if [[ ! -e ${BASE_DIR}/bin/fly ]]; then
+    if [[ ! -e "${BASE_DIR}/bin/fly" ]]; then
         bash ${DEBUG:+"-x"} "${SUBSYS_DIR}/fetch-fly-cli"
     fi
 
@@ -30,9 +30,9 @@ function main() {
     login_status=$?
     set -e
 
-    "${BASE_DIR}/bin/fly" -t "${concourse_target}" sync
+    "${BASE_DIR}/bin/fly" --target="${concourse_target}" sync
 
-    if [[ ${login_status} -ne 0 ]]; then
+    if [[ "${login_status}" -ne 0 ]]; then
         # Try to log in again, if by any chance it failed because of version
         # mismatch that would be solved by the 'fly sync' above.
         set +e
@@ -44,7 +44,11 @@ function main() {
         set -e
     fi
 
-    if [[ ${login_status} -eq 0 ]]; then echo "OK"; else echo "ERROR"; fi
+    if [[ "${login_status}" -eq 0 ]]; then
+        echo "${BOLD}${GREEN}OK${RESET}"
+    else
+        echo "${BOLD}${RED}ERROR${RESET}"
+    fi
     exit "${login_status}"
 }
 
@@ -53,24 +57,30 @@ function setup() {
     BASE_DIR=${BASE_DIR:-$(cd "${SUBSYS_DIR}" && git rev-parse --show-toplevel)}
     SUBSYS_NAME=$(own_spec_var /subsys/name)
     readonly SUBSYS_DIR BASE_DIR SUBSYS_NAME
+
+    BOLD=$(tput bold)
+    RED=$(tput setaf 1)
+    GREEN=$(tput setaf 2)
+    RESET=$(tput sgr0)
+    readonly BOLD RED GREEN RESET
 }
 
 function priv_cfg_var() {
     local path=$1
-    bosh int "${SUBSYS_DIR}/conf/private-config.yml" --path "${path}"
+    bosh interpolate "${SUBSYS_DIR}/conf/private-config.yml" --path="${path}"
 }
 
 function own_spec_var() {
     local path=$1
-    bosh int "${SUBSYS_DIR}/conf/spec.yml" --path "${path}"
+    bosh interpolate "${SUBSYS_DIR}/conf/spec.yml" --path="${path}"
 }
 
 function spec_var() {
     local path=$1
 
-    local has_upstream spec_file
+    local has_upstream  spec_file
     has_upstream=$(own_spec_var "/subsys/upstream" 2> /dev/null || true)
-    if [[ -n ${has_upstream} ]]; then
+    if [[ -n "${has_upstream}" ]]; then
         state_var "merged-spec" "${path}"
     else
         own_spec_var "${path}"
@@ -80,7 +90,7 @@ function spec_var() {
 function state_var() {
     local state_file=$1
     local path=$2
-    bosh int "${BASE_DIR}/state/${SUBSYS_NAME}/${state_file}.yml" --path "${path}"
+    bosh interpolate "${BASE_DIR}/state/${SUBSYS_NAME}/${state_file}.yml" --path="${path}"
 }
 
 function creds_var() {

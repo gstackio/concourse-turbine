@@ -32,18 +32,18 @@ function setup() {
 
 function priv_cfg_var() {
     local path=$1
-    bosh int "${SUBSYS_DIR}/conf/private-config.yml" --path "${path}"
+    bosh interpolate "${SUBSYS_DIR}/conf/private-config.yml" --path="${path}"
 }
 
 function own_spec_var() {
     local path=$1
-    bosh int "${SUBSYS_DIR}/conf/spec.yml" --path "${path}"
+    bosh interpolate "${SUBSYS_DIR}/conf/spec.yml" --path="${path}"
 }
 
 function state_var() {
     local state_file=$1
     local path=$2
-    bosh int "${BASE_DIR}/state/${SUBSYS_NAME}/${state_file}.yml" --path "${path}"
+    bosh interpolate "${BASE_DIR}/state/${SUBSYS_NAME}/${state_file}.yml" --path="${path}"
 }
 
 function creds_var() {
