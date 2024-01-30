@@ -83,8 +83,8 @@ deployment_vars:
   os_conf_version: "22.2.0"
   os_conf_sha1: 5df557f14f073d7ab6a685680a232c1b74c393c5
 
-  credhub_version: "2.12.51"
-  credhub_sha1: 5d3ba904e2745803d28ef43c3f8a186f37a03956
+  credhub_version: "2.12.59"
+  credhub_sha1: 6556aed705307170178a34c69d7ae4fae1b0dc05
 
   uaa_version: "76.31.0"
   uaa_sha1: d02d9aaa90a623196bce4c8de934ccef858715da
