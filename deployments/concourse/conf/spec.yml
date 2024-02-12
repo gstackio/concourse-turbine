@@ -86,8 +86,8 @@ deployment_vars:
   credhub_version: "2.12.61"
   credhub_sha1: 14f6d760c427ee73c9baa25700289165ad1a9c95
 
-  uaa_version: "76.31.0"
-  uaa_sha1: d02d9aaa90a623196bce4c8de934ccef858715da
+  uaa_version: "77.0.0"
+  uaa_sha1: d398264cf7cfeaeb32dafd1d694e7fb439723051
 
   traefik_version: "1.15.0"
   traefik_sha1: d504c6a5e52056e3d87117d7031c06e21658109e
