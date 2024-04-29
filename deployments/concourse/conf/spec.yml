@@ -92,8 +92,8 @@ deployment_vars:
   traefik_version: "1.15.0"
   traefik_sha1: d504c6a5e52056e3d87117d7031c06e21658109e
 
-  bbr_sdk_version: "1.19.12"
-  bbr_sdk_sha1: 3912f137ee1d1feaa40b3d8e9dbce004dcf74b95
+  bbr_sdk_version: "1.19.13"
+  bbr_sdk_sha1: 71065388a8324f539166d57370c20d574d169a6d
 
   # stemcell_os:              # imported below
   # stemcell_version:         # imported below
