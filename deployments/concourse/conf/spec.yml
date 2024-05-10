@@ -89,8 +89,8 @@ deployment_vars:
   uaa_version: "77.9.0"
   uaa_sha1: 2880e700842c87d6ae615a9b41e152d0091fc3bd
 
-  traefik_version: "1.15.0"
-  traefik_sha1: d504c6a5e52056e3d87117d7031c06e21658109e
+  traefik_version: "1.16.0"
+  traefik_sha1: 896eaeed289b6ec5670029ed5f30e28ccb1b3d87
 
   bbr_sdk_version: "1.19.14"
   bbr_sdk_sha1: b4697d86afe02b68bc1ea35ba91a6ff7762517ae
