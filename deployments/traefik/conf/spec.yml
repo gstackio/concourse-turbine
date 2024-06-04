@@ -52,8 +52,8 @@ deployment_vars:
 
   stemcell_name: bosh-warden-boshlite-ubuntu-jammy-go_agent
   stemcell_os: ubuntu-jammy
-  stemcell_version: "1.445"
-  stemcell_sha1: f8087498a8c5921a91613ac1c9b9828ef1b9cba2
+  stemcell_version: "1.465"
+  stemcell_sha1: 61255029fa3c1cf4a2c28203b58c9aabc67056c4
 
 
   # Reference declarations
