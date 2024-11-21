@@ -68,8 +68,8 @@ deployment_vars:
 
   # Versions
 
-  bosh_version: "280.1.10"
-  bosh_sha1: 4fee52233042de9a9c4374e40419acffc9c4eb4f
+  bosh_version: "280.1.11"
+  bosh_sha1: 19e071dd9f220c13c3c1481fee6ab5a1d6648457
 
   stemcell_name: bosh-vsphere-esxi-ubuntu-jammy-go_agent
   stemcell_version: "1.639"
